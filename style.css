@@ -1,0 +1,204 @@
+body {
+    font-family: 'Prompt', 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #232323; /* Texto negro */
+}
+
+header {
+    color: 232323;
+    text-align: left;
+    padding: 20px 20px; /* Espaciado extra en el header */
+}
+
+h1, h2 {
+    margin: 0;
+    padding: 10px 0; /* Añadido espaciado en el título */
+}
+
+.logo-title {
+    display: flex;
+    align-items: center; /* Alinea la imagen y el texto verticalmente */
+}
+
+header img {
+    max-width: 50px; /* Tamaño de la imagen */
+    margin-right: 15px; /* Espacio entre la imagen y el título */
+}
+
+#hero {
+    text-align: center;
+    padding: 80px 20px; /* Aumentado el espaciado para la sección de héroe */
+    background: linear-gradient(45deg, #6ffea4, hsl(212, 100%, 57%)); /* Degradado esquinado de verde a azul para todo el body */
+    color: white;
+}
+
+#hero h1 {
+    font-size: 2.6rem; /* Tamaño grande para el título principal */
+    font-weight: bold; /* Negrita */
+}
+
+#hero h2 {
+    font-size: 1.5rem; /* Un poco más pequeño que el h1 */
+    font-weight: normal;
+}
+
+
+#hero img {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+
+.button {
+    display: inline-block;
+    background-color: #80dde287;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+
+.button:hover {
+    background-color: #1c817b80;
+}
+
+section {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.carousel img {
+    width: 200px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#faq details {
+    margin: 10px auto;
+    width: 80%;
+    max-width: 600px;
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.prompt-thin {
+    font-family: "Prompt", sans-serif;
+    font-weight: 100;
+    font-style: normal;
+  }
+  
+  .prompt-extralight {
+    font-family: "Prompt", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+  }
+  
+  .prompt-light {
+    font-family: "Prompt", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+  }
+  
+  .prompt-regular {
+    font-family: "Prompt", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .prompt-medium {
+    font-family: "Prompt", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+  }
+  
+  .prompt-semibold {
+    font-family: "Prompt", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+  }
+  
+  .prompt-bold {
+    font-family: "Prompt", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+  .prompt-extrabold {
+    font-family: "Prompt", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+  }
+  
+  .prompt-black {
+    font-family: "Prompt", sans-serif;
+    font-weight: 900;
+    font-style: normal;
+  }
+  
+  .prompt-thin-italic {
+    font-family: "Prompt", sans-serif;
+    font-weight: 100;
+    font-style: italic;
+  }
+  
+  .prompt-extralight-italic {
+    font-family: "Prompt", sans-serif;
+    font-weight: 200;
+    font-style: italic;
+  }
+  
+  .prompt-light-italic {
+    font-family: "Prompt", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+  }
+  
+  .prompt-regular-italic {
+    font-family: "Prompt", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+  }
+  
+  .prompt-medium-italic {
+    font-family: "Prompt", sans-serif;
+    font-weight: 500;
+    font-style: italic;
+  }
+  
+  .prompt-semibold-italic {
+    font-family: "Prompt", sans-serif;
+    font-weight: 600;
+    font-style: italic;
+  }
+  
+  .prompt-bold-italic {
+    font-family: "Prompt", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+  }
+  
+  .prompt-extrabold-italic {
+    font-family: "Prompt", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+  }
+  
+  .prompt-black-italic {
+    font-family: "Prompt", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+  }
+  
