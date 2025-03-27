@@ -5,6 +5,23 @@ body {
   background-color: #f4f4f4;
 }
 
+header {
+  color: 232323;
+  text-align: left;
+  padding: 20px 20px; /* Espaciado extra en el header */
+}
+
+.logo-title {
+  display: flex;
+  align-items: center; /* Alinea la imagen y el texto verticalmente */
+}
+
+
+header img {
+  max-width: 50px; /* Tamaño de la imagen */
+  margin-right: 15px; /* Espacio entre la imagen y el título */
+}
+
 h1 {
   text-align: left;
 }
