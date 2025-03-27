@@ -51,7 +51,7 @@ header img {
 
 .butBody {
   display: inline-block;
-  background-color: #38c79c;
+  background-color: #252eac;
   color: white;
   padding: 10px 20px;
   text-decoration: none;
@@ -61,13 +61,13 @@ header img {
 }
 
 .butBody:hover {
-  background-color: #3aebc7;
+  background-color: #3a81eb;
 }
 
 
 .button {
     display: inline-block;
-    background-color: #3c70b96c;
+    background-color: #3143d29c;
     color: white;
     padding: 10px 20px;
     text-decoration: none;
@@ -77,7 +77,7 @@ header img {
 }
 
 .button:hover {
-  background-color: #5f9de08c;
+  background-color: #267febbb;
 }
 
 
