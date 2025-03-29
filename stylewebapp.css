@@ -1,85 +1,347 @@
+/* Base Styles */
 body {
   font-family: 'Prompt', sans-serif;
   margin: 0;
-  padding: 20px;
-  background-color: #f4f4f4;
+  padding: 0;
+  background-color: #f4f7fa;
+  color: #333;
+  line-height: 1.6;
 }
 
+#main-page, #subject-details-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Header Styles */
 header {
-  color: 232323;
-  text-align: left;
-  padding: 20px 20px; /* Espaciado extra en el header */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e9ecef;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 15px;
 }
 
 .logo-title {
   display: flex;
-  align-items: center; /* Alinea la imagen y el texto verticalmente */
+  align-items: center;
 }
 
-
 header img {
-  max-width: 50px; /* Tamaño de la imagen */
-  margin-right: 15px; /* Espacio entre la imagen y el título */
+  max-width: 50px;
+  margin-right: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-  text-align: left;
+  margin: 0;
+  color: #232323;
+  font-weight: 600;
 }
 
+h3 {
+  color: #343a40;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* Button Styles */
 button {
   padding: 10px 20px;
-  margin: 10px;
+  margin: 10px 0;
   cursor: pointer;
   border: none;
   background-color: #007bff;
   color: white;
   border-radius: 5px;
+  transition: all 0.3s ease;
+  font-family: 'Prompt', sans-serif;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
   background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-#popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-
-#popup-form {
-  background: white;
-  padding: 20px;
-  border-radius: 5px;
-  width: 300px;
-}
-
-#popup-form input {
+#add-subject, #add-grade-in-details {
+  background-color: #28a745;
+  display: block;
   width: 100%;
-  margin: 10px 0;
-  padding: 8px;
+  max-width: 300px;
+  margin: 20px auto;
+  font-size: 16px;
+  padding: 12px 20px;
+}
+
+#add-subject:hover, #add-grade-in-details:hover {
+  background-color: #218838;
+}
+
+#back-to-main {
+  background-color: #6c757d;
+  margin-right: 15px;
+}
+
+#back-to-main:hover {
+  background-color: #545b62;
+}
+
+/* Item Styles */
+.subject-item, .grade-item {
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative; /* For delete button positioning */
 }
 
 .subject-item {
+  border: none;
+}
+
+.grade-item {
   background-color: white;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
 }
 
-.subject-item button {
-  background-color: #28a745;
+.subject-item:hover, .grade-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.subject-item button, .grade-item button {
+  display: block;
+  width: auto;
+  margin-left: auto;
+}
+
+#subject-list, #subject-grades-list {
+  margin-top: 20px;
+}
+
+/* Progress Bar Styles */
 #progress-bar {
-  margin: 20px 0;
+  margin: 15px 0;
   width: 100%;
   height: 20px;
-  background-color: #ddd; 
+  background-color: #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#progress-bar div {
+  height: 100%;
+  background-color: #28a745;
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+
+/* Popup Styles */
+#subject-popup, #grade-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+#subject-popup.active, #grade-popup.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+#subject-popup-form, #grade-popup-form {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 350px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transform: scale(0.9);
+  transition: all 0.3s ease;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+#subject-popup.active #subject-popup-form, 
+#grade-popup.active #grade-popup-form {
+  transform: scale(1);
+}
+
+#subject-popup-form h3, #grade-popup-form h3 {
+  margin-top: 0px;
+  color: #333;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 20px;
+}
+
+#subject-popup-form label, #grade-popup-form label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 1px;
+  font-weight: 500;
+  color: #495057;
+}
+
+#subject-popup-form input, #grade-popup-form input {
+  width: 100%;
+  margin: 8px 0 1px;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-family: 'Prompt', sans-serif;
+  transition: border-color 0.3s;
+}
+
+#subject-popup-form input:focus, #grade-popup-form input:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+#subject-popup-submit, #grade-popup-submit {
+  background-color: #28a745;
+  flex: 1;
+  margin-right: 10px;
+}
+
+#subject-popup-close, #grade-popup-close {
+  background-color: #dc3545;
+  flex: 1;
+  margin-left: 10px;
+}
+
+/* Weighting Type Buttons */
+#weighting-type {
+  display: flex;
+  margin: 15px 0;
+}
+
+.weighting-btn {
+  flex: 1;
+  margin: 0 5px;
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.weighting-btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Credits and Color Selection */
+#credits-grid, #color-grid, #grade-percentage-grid, #subject-percentage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: 8px;      /* Espacio entre columnas */
+  row-gap: 0px;
+  margin: 6px 0;
+}
+
+.credits-btn, .grade-percentage-btn, .subject-percentage-btn {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  margin: 0px 0px 8px 0px;
+}
+
+.color-btn {
+  height: 40px;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  margin: 0px 0px 8px 0px;
+}
+
+.color-btn.active, .credits-btn.active, .grade-percentage-btn.active, .subject-percentage-btn.active {
+  transform: scale(0.95);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border: 2px solid #007bff;
+  
+}
+
+/* Subject Details Styles */
+#subject-details-title {
+  text-align: center;
+  color: #232323;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+#subject-current-score {
+  font-size: 1.8rem;
+  color: #007bff;
+  font-weight: 600;
+  text-align: center;
+  display: block;
+  margin: 15px 0;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+#final-score {
+  font-size: 1.8rem;
+  color: #383838;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  #main-page, #subject-details-page {
+      padding: 15px;
+      margin: 10px;
+      border-radius: 8px;
+  }
+  
+  #subject-popup-form, #grade-popup-form {
+      width: 90%;
+      margin: 0 5%;
+      padding: 20px;
+  }
+  
+  #credits-grid, #color-grid, #grade-percentage-grid {
+      grid-template-columns: repeat(2, 1fr);
+  }
+  
+  header {
+      flex-direction: column;
+      text-align: center;
+  }
+  
+  .logo-title {
+      margin-bottom: 10px;
+  }
 }
