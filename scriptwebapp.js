@@ -1,8 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const subjects = [];
+    // Hacer subjects global para acceder desde las funciones de autenticación
+    window.subjects = [];
+    
+    // Hacer todas las funciones globales para que estén disponibles desde cualquier script
+    window.renderSubjects = renderSubjects;
+    window.updateFinalScore = updateFinalScore;
+    window.showSubjectDetails = showSubjectDetails;
+    window.calculateSubjectScore = calculateSubjectScore;
     
     // Main page elements
-    const mainPage = document.getElementById("main-page");
+    const mainPage = document.getElementById("calculator-page");
     const addSubjectBtn = document.getElementById("add-subject");
     const subjectList = document.getElementById("subject-list");
     const finalScore = document.getElementById("final-score");
@@ -27,29 +34,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const gradePopupClose = document.getElementById("grade-popup-close");
     
     let currentSubjectIndex = -1;
+    let editingSubjectIndex = -1; // Para seguir si estamos editando una materia existente
     let editingGradeIndex = -1; // Pour suivre si nous modifions une note existante
 
     // Create progress bar inner div
     const progressBarInner = document.createElement("div");
     progressBar.appendChild(progressBarInner);
+    
 
-    // Open subject popup
+    // Modificar el evento click del botón "Añadir materia" para resetear el formulario
     addSubjectBtn.addEventListener("click", () => {
-        subjectPopup.style.display = "flex";
-        subjectPopup.classList.add("active");
+        // Resetear el índice de edición
+        editingSubjectIndex = -1;
         
-        // Reset form
+        // Cambiar el título y el botón según corresponda
+        document.querySelector("#subject-popup-form h3").textContent = "Ajouter un Cours";
+        document.getElementById("subject-popup-submit").textContent = "Ajouter";
+        
+        // Resetear el formulario
         document.getElementById("subject-name").value = "";
         document.getElementById("subject-percentage").value = "";
         document.getElementById("other-subject-percentage").style.display = "none";
         
-        // Deselect all percentage buttons for subject
+        // Deseleccionar todos los botones de porcentaje
         document.querySelectorAll('.subject-percentage-btn').forEach(btn => {
             btn.classList.remove('active');
         });
         
-        document.querySelectorAll('.weighting-btn')[0].click(); // Select percentage by default
-        document.querySelectorAll('.color-btn')[0].click(); // Select first color by default
+        document.querySelectorAll('.weighting-btn')[0].click(); // Seleccionar porcentaje por defecto
+        document.querySelectorAll('.color-btn')[0].click(); // Seleccionar primer color por defecto
+        
+        // Mostrar el popup
+        subjectPopup.style.display = "flex";
+        subjectPopup.classList.add("active");
     });
 
     // Close subject popup
@@ -187,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Add subject from popup
+    // Modificar el evento submit del popup de materia para manejar edición
     subjectPopupSubmit.addEventListener('click', () => {
         const name = document.getElementById('subject-name').value;
         const weightingType = document.querySelector('.weighting-btn.active').dataset.type;
@@ -227,10 +244,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 color, 
                 grades: [] 
             };
-            subjects.push(subject);
+            
+            if (editingSubjectIndex !== -1) {
+                // Estamos editando una materia existente
+                // Preservar las calificaciones existentes
+                subject.grades = window.subjects[editingSubjectIndex].grades;
+                window.subjects[editingSubjectIndex] = subject;
+                editingSubjectIndex = -1; // Resetear el índice de edición
+            } else {
+                // Estamos añadiendo una nueva materia
+                window.subjects.push(subject);
+            }
+            
             renderSubjects();
             
-            // Close popup with animation
+            // Guardar en Firebase
+            if (auth && auth.currentUser) {
+                saveUserData();
+            }
+            
+            // Cerrar popup con animación
             subjectPopup.classList.remove("active");
             setTimeout(() => {
                 subjectPopup.style.display = "none";
@@ -240,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Add or update grade from popup
+    // Add or update grade from popup - MODIFICADO para Firebase
     gradePopupSubmit.addEventListener('click', () => {
         const gradeName = document.getElementById('grade-name').value;
         const gradeValue = parseFloat(document.getElementById('grade-value').value);
@@ -272,13 +305,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (editingGradeIndex !== -1) {
                 // Modification d'une note existante
-                subjects[currentSubjectIndex].grades[editingGradeIndex] = grade;
+                window.subjects[currentSubjectIndex].grades[editingGradeIndex] = grade;
             } else {
                 // Ajout d'une nouvelle note
-                subjects[currentSubjectIndex].grades.push(grade);
+                window.subjects[currentSubjectIndex].grades.push(grade);
             }
             
-            showSubjectDetails(subjects[currentSubjectIndex]);
+            showSubjectDetails(window.subjects[currentSubjectIndex]);
+            
+            // Nuevo: Guardar en Firebase
+            if (auth && auth.currentUser) {
+                saveUserData();
+            }
             
             // Close popup with animation
             gradePopup.classList.remove("active");
@@ -290,26 +328,131 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Fonction pour ouvrir le popup pour modifier une note
+    // Función para abrir el popup para modificar una materia
+    function openEditSubjectPopup(subjectIndex) {
+        if (subjectIndex >= 0) {
+            const subject = window.subjects[subjectIndex];
+            editingSubjectIndex = subjectIndex;
+            
+            // Cambiar título del popup y botón
+            document.querySelector("#subject-popup-form h3").textContent = "Modifier le Cours";
+            document.getElementById("subject-popup-submit").textContent = "Enregistrer";
+            
+            // Rellenar el formulario con los datos de la materia
+            document.getElementById("subject-name").value = subject.name;
+            
+            // Seleccionar el tipo de ponderación correcto
+            const weightingButtons = document.querySelectorAll('.weighting-btn');
+            weightingButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.type === subject.weightingType) {
+                    btn.classList.add('active');
+                    
+                    // Mostrar la sección correspondiente
+                    if (subject.weightingType === 'percentage') {
+                        document.getElementById('percentage-section').style.display = 'block';
+                        document.getElementById('credits-section').style.display = 'none';
+                    } else {
+                        document.getElementById('percentage-section').style.display = 'none';
+                        document.getElementById('credits-section').style.display = 'block';
+                    }
+                }
+            });
+            
+            // Manejar la selección del valor de ponderación
+            if (subject.weightingType === 'percentage') {
+                document.getElementById('subject-percentage').value = subject.weight;
+                
+                // Intentar seleccionar el botón de porcentaje correspondiente
+                let percentageButtonFound = false;
+                document.querySelectorAll('.subject-percentage-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.percentage == subject.weight) {
+                        btn.classList.add('active');
+                        percentageButtonFound = true;
+                    }
+                });
+                
+                // Si no se encontró un botón exacto, seleccionar "Otro"
+                if (!percentageButtonFound) {
+                    const otherBtn = document.querySelector('.subject-percentage-btn[data-other="true"]');
+                    if (otherBtn) {
+                        otherBtn.classList.add('active');
+                        document.getElementById("other-subject-percentage").style.display = "block";
+                        document.getElementById("other-subject-percentage").value = subject.weight;
+                    }
+                } else {
+                    document.getElementById("other-subject-percentage").style.display = "none";
+                }
+            } else {
+                // Manejar créditos ECTS
+                let creditsButtonFound = false;
+                document.querySelectorAll('.credits-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.credits == subject.weight) {
+                        btn.classList.add('active');
+                        creditsButtonFound = true;
+                    }
+                });
+                
+                // Si no se encontró un botón exacto, seleccionar "Otro"
+                if (!creditsButtonFound) {
+                    const otherBtn = document.querySelector('.credits-btn[data-other="true"]');
+                    if (otherBtn) {
+                        otherBtn.classList.add('active');
+                        document.getElementById("other-credits").style.display = "block";
+                        document.getElementById("other-credits").value = subject.weight;
+                    }
+                } else {
+                    document.getElementById("other-credits").style.display = "none";
+                }
+            }
+            
+            // Manejar la selección del color
+            let colorButtonFound = false;
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.style.backgroundColor === subject.color) {
+                    btn.classList.add('active');
+                    colorButtonFound = true;
+                }
+            });
+            
+            // Si no se encontró un color exacto, seleccionar "Otro"
+            if (!colorButtonFound) {
+                const otherBtn = document.querySelector('.color-btn[data-other="true"]');
+                if (otherBtn) {
+                    otherBtn.classList.add('active');
+                    document.getElementById("other-color").style.display = "block";
+                    document.getElementById("other-color").value = subject.color;
+                }
+            } else {
+                document.getElementById("other-color").style.display = "none";
+            }
+            
+            // Mostrar el popup
+            subjectPopup.style.display = "flex";
+            subjectPopup.classList.add("active");
+        }
+    }
+
+    // Función para abrir el popup para editar una nota
     function openEditGradePopup(gradeIndex) {
         if (currentSubjectIndex !== -1 && gradeIndex >= 0) {
-            const grade = subjects[currentSubjectIndex].grades[gradeIndex];
+            const subject = window.subjects[currentSubjectIndex];
+            const grade = subject.grades[gradeIndex];
             editingGradeIndex = gradeIndex;
             
-            // Changer titre du popup et bouton
+            // Cambiar título del popup y botón
             document.querySelector("#grade-popup-form h3").textContent = "Modifier la Note";
             document.getElementById("grade-popup-submit").textContent = "Enregistrer";
             
-            // Remplir le formulaire avec les données de la note
+            // Rellenar el formulario
             document.getElementById("grade-name").value = grade.name;
             document.getElementById("grade-value").value = grade.value;
             document.getElementById("grade-percentage").value = grade.percentage;
             
-            // Afficher le popup
-            gradePopup.style.display = "flex";
-            gradePopup.classList.add("active");
-            
-            // Essayer de sélectionner le bouton de pourcentage correspondant
+            // Intentar seleccionar el botón de porcentaje correspondiente
             let percentageButtonFound = false;
             document.querySelectorAll('.grade-percentage-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -319,7 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
             
-            // Si aucun bouton avec le pourcentage exact n'a été trouvé, sélectionner "Autre"
+            // Si no se encontró un botón exacto, seleccionar "Otro"
             if (!percentageButtonFound) {
                 const otherBtn = document.querySelector('.grade-percentage-btn[data-other="true"]');
                 if (otherBtn) {
@@ -330,14 +473,19 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 document.getElementById("other-grade-percentage").style.display = "none";
             }
+            
+            // Mostrar el popup
+            gradePopup.style.display = "flex";
+            gradePopup.classList.add("active");
         }
     }
 
-    // Render subjects in the list with improved styling (more compact)
+    // Función para renderizar las materias con botón de editar
     function renderSubjects() {
+        console.log("Renderizando materias:", window.subjects);
         subjectList.innerHTML = "";
 
-        if (subjects.length === 0) {
+        if (!window.subjects || window.subjects.length === 0) {
             const emptyMessage = document.createElement("div");
             emptyMessage.textContent = "Aucun cours enregistré pour le moment.";
             emptyMessage.style.textAlign = "center";
@@ -345,7 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
             emptyMessage.style.color = "#6c757d";
             subjectList.appendChild(emptyMessage);
         } else {
-            subjects.forEach((subject, index) => {
+            window.subjects.forEach((subject, index) => {
                 const div = document.createElement("div");
                 div.classList.add("subject-item");
                 
@@ -381,7 +529,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     </span>
                 `;
                 
-                // Right side with score and delete button
+                // Right side with score, edit and delete buttons
                 const actionSide = document.createElement('div');
                 actionSide.style.display = "flex";
                 actionSide.style.flexDirection = "column";
@@ -406,6 +554,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span style="font-size: 0.6rem; color: #666;">${getGradeStatus(subjectScore)}</span>
                 `;
                 
+                // Container for buttons
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.display = "flex";
+                buttonContainer.style.gap = "4px";
+                buttonContainer.style.marginBottom = "5px";
+                
+                // Edit button
+                const editBtn = document.createElement("button");
+                editBtn.textContent = "Modifier";
+                editBtn.style.padding = "4px 8px";
+                editBtn.style.backgroundColor = "#007bff";
+                editBtn.style.fontSize = "0.75rem";
+                editBtn.style.margin = "0";
+                
+                editBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    openEditSubjectPopup(index);
+                });
+                
                 // Delete button
                 const deleteBtn = document.createElement("button");
                 deleteBtn.textContent = "Supprimer";
@@ -417,21 +584,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 deleteBtn.addEventListener("click", (e) => {
                     e.stopPropagation();
                     if (confirm(`Êtes-vous sûr de vouloir supprimer "${subject.name}" ?`)) {
-                        subjects.splice(index, 1);
+                        window.subjects.splice(index, 1);
                         renderSubjects();
                         updateFinalScore();
+                        
+                        // Guardar en Firebase
+                        if (auth && auth.currentUser) {
+                            saveUserData();
+                        }
                     }
                 });
                 
+                // Append buttons to container
+                buttonContainer.appendChild(editBtn);
+                buttonContainer.appendChild(deleteBtn);
+                
                 // Append elements
                 actionSide.appendChild(scoreCircle);
-                actionSide.appendChild(deleteBtn);
+                actionSide.appendChild(buttonContainer);
                 div.appendChild(infoSide);
                 div.appendChild(actionSide);
                 
-                // Make the div clickable (excluding the delete button)
+                // Make the div clickable (excluding the edit and delete buttons)
                 div.addEventListener("click", (e) => {
-                    if (e.target !== deleteBtn && !deleteBtn.contains(e.target)) {
+                    if (e.target !== editBtn && !editBtn.contains(e.target) && 
+                        e.target !== deleteBtn && !deleteBtn.contains(e.target)) {
                         currentSubjectIndex = index;
                         showSubjectDetails(subject);
                     }
@@ -443,21 +620,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Update final score
         updateFinalScore();
+        
+        // Guardar datos en Firebase después de cada cambio
+        if (auth && auth.currentUser) {
+            saveUserData();
+        }
     }
 
-    // Show subject details when clicked
-    function showSubjectDetails(subject) {
-        // Hide main page, show details page
-        mainPage.style.display = "none";
+    // Show subject details when clicked - MODIFICADO para Firebase
+function showSubjectDetails(subject) {
+        // Ocultar todas las páginas de contenido
+        document.querySelectorAll('.content-page').forEach(page => {
+            page.style.display = "none";
+        });
+        
+        // Mostrar la página de detalles
+        const subjectDetailsPage = document.getElementById("subject-details-page");
         subjectDetailsPage.style.display = "block";
+        
 
         // Set subject title and current score
-        subjectDetailsTitle.textContent = subject.name;
+        document.getElementById("subject-details-title").textContent = subject.name;
         
         // Calculate and display subject score
         const subjectScore = calculateSubjectScore(subject);
-        subjectCurrentScore.textContent = `${subjectScore.toFixed(2)} / 20`;
-
+        
+        document.getElementById("subject-current-score").textContent = `${subjectScore.toFixed(2)} / 20`;
+   
         // Render grades list
         subjectGradesList.innerHTML = "";
         
@@ -537,6 +726,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         subject.grades.splice(index, 1);
                         showSubjectDetails(subject);
                         updateFinalScore();
+                        
+                        // Nuevo: Guardar en Firebase
+                        if (auth && auth.currentUser) {
+                            saveUserData();
+                        }
                     }
                 });
                 
@@ -551,6 +745,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 subjectGradesList.appendChild(gradeDiv);
             });
+        }
+        
+        // Guardar datos en Firebase después de cada cambio
+        if (auth && auth.currentUser) {
+            saveUserData();
         }
     }
 
@@ -595,12 +794,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Update final score and progress bar - FIXED VERSION
+    // Update final score and progress bar - MODIFICADO para Firebase
     function updateFinalScore() {
         let total = 0;
         let weightSum = 0;
 
-        subjects.forEach(subject => {
+        window.subjects.forEach(subject => {
             if (subject.grades.length > 0) {
                 const subjectScore = calculateSubjectScore(subject);
                 
@@ -623,6 +822,28 @@ document.addEventListener("DOMContentLoaded", () => {
         else progressBarInner.style.backgroundColor = "#dc3545"; // Red
     }
 
-    // Initialize app
-    renderSubjects();
+    // Inicializar la aplicación - Verificar si el usuario ya está autenticado al cargar
+    function initializeApp() {
+        console.log("Inicializando aplicación...");
+        
+        // Verificar si auth está definido y si hay un usuario autenticado
+        if (typeof auth !== 'undefined') {
+            console.log("Auth está definido");
+            if (auth.currentUser) {
+                console.log("Usuario autenticado:", auth.currentUser.uid);
+                loadUserData(auth.currentUser.uid);
+            } else {
+                console.log("No hay usuario autenticado, renderizando materias vacías");
+                window.subjects = window.subjects || [];
+                renderSubjects();
+            }
+        } else {
+            console.log("Auth no está definido, esperando...");
+            // Si auth no está definido, esperar un poco y volver a intentar
+            setTimeout(initializeApp, 1000);
+        }
+    }
+    
+    // Llamar a la función de inicialización
+    initializeApp();
 });
