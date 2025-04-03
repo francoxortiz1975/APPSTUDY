@@ -1,1 +1,10 @@
+# Archivos sensibles
 config.js
+googleConfig.js
+
+# Directorios de node
+node_modules/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db

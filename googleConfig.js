@@ -4,7 +4,7 @@ const googleConfig = {
   // No coloques el client secret aquí, debe mantenerse en el servidor
 };
 
-// No exportamos directamente el objeto para evitar exposición en repositorios públicos
-function getGoogleClientId() {
+// Exponemos la función globalmente para que pueda ser utilizada por auth.js
+window.getGoogleClientId = function() {
   return googleConfig.clientId;
 }

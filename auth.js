@@ -65,23 +65,31 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fournisseur d'authentification Google
     const googleProvider = new firebase.auth.GoogleAuthProvider();
     googleProvider.setCustomParameters({
-        client_id: googleClientId,
         prompt: 'select_account'
     });
     
-    // Fonction pour se connecter avec Google
     function signInWithGoogle() {
         console.log("Intentando iniciar sesión con Google...");
+        
         firebase.auth().signInWithPopup(googleProvider)
             .then((result) => {
                 console.log("Connexion réussie", result.user);
-                // Pas besoin de faire quoi que ce soit ici, l'écouteur de changement d'auth s'en chargera
             })
             .catch((error) => {
                 console.error("Erreur de connexion:", error);
                 console.error("Code:", error.code);
                 console.error("Message:", error.message);
-                alert("Un problème est survenu lors de la connexion. Veuillez réessayer.");
+                
+                // Manejar errores específicos
+                if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+                    console.log("Popup bloqueado o cerrado, intentando con redirección...");
+                    return firebase.auth().signInWithRedirect(googleProvider);
+                } else if (error.code === 'auth/cancelled-popup-request') {
+                    console.log("Solicitud de popup cancelada, probablemente múltiples intentos");
+                    return;
+                } else {
+                    alert("Error de autenticación: " + error.message);
+                }
             });
     }
     
