@@ -8,6 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Etudly - Votre assistant d'études</title>
     <link rel="stylesheet" href="stylewebapp.css">
+    
+    <!-- Meta para Google Sign-In -->
+    <meta name="google-signin-client_id" content="157181619799-7bh6g4fkc1ft81m2tr09dec60cn2sktf.apps.googleusercontent.com">
 </head>
 <body>
     <!-- Page de connexion (visible au démarrage) -->
@@ -299,24 +302,19 @@
         </div>
     </div>
 
+    <!-- Google Platform Library -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
 
-    <!-- Configuration Firebase -->
+    <!-- Configuration Firebase et Google -->
+    <script src="config.js"></script>
+    <script src="googleConfig.js"></script>
     <script>
-        // Configuration de Firebase avec vos identifiants
-        const firebaseConfig = {
-            authDomain: "studeasy-4d71f.firebaseapp.com",
-            projectId: "studeasy-4d71f",
-            storageBucket: "studeasy-4d71f.firebasestorage.app",
-            messagingSenderId: "1065894844199",
-            appId: "1:1065894844199:web:6723b8887f1492e2e9bb02",
-            measurementId: "G-58V8MD3PLP"
-        };
-        
         // Initialiser Firebase
         firebase.initializeApp(firebaseConfig);
         

@@ -2,8 +2,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Références aux éléments de l'interface utilisateur pour la connexion
     const loginBtn = document.getElementById("login-with-google");
-    const emailLoginForm = document.getElementById("login-with-email");    // Modificado: ahora es un form
-    const registerForm = document.getElementById("register-button");       // Modificado: ahora es un form
+    const emailLoginForm = document.getElementById("login-with-email");
+    const registerForm = document.getElementById("register-button");
     const logoutBtn = document.getElementById("sidebar-logout");
     const loginPage = document.getElementById("login-page");
     const appContainer = document.getElementById("app-container");
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const showRegisterFormAltBtn = document.getElementById("show-register-form-alt");
     const backToLoginBtns = document.querySelectorAll(".back-to-login-options");
     
-    // Configuración de navegación UI (añadido para evitar conflictos con el script en línea)
+    // Configuración de navegación UI
     if (showLoginFormBtn) {
         showLoginFormBtn.addEventListener("click", () => {
             document.getElementById("login-section").style.display = "none";
@@ -59,13 +59,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
     
+    // Obtener el clientId de Google desde el archivo de configuración
+    const googleClientId = getGoogleClientId();
+    
     // Fournisseur d'authentification Google
     const googleProvider = new firebase.auth.GoogleAuthProvider();
+    googleProvider.setCustomParameters({
+        client_id: googleClientId,
+        prompt: 'select_account'
+    });
     
     // Fonction pour se connecter avec Google
     function signInWithGoogle() {
         console.log("Intentando iniciar sesión con Google...");
-        auth.signInWithPopup(googleProvider)
+        firebase.auth().signInWithPopup(googleProvider)
             .then((result) => {
                 console.log("Connexion réussie", result.user);
                 // Pas besoin de faire quoi que ce soit ici, l'écouteur de changement d'auth s'en chargera
@@ -193,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Fonction pour se déconnecter
     function signOut() {
-        console.log("Cerrando sesión...");
+        console.log("Deconnexion en process");
         auth.signOut()
             .then(() => {
                 console.log("Déconnexion réussie");
@@ -253,7 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
-    // Assigner des événements aux boutons (modificado para agregar más logs y corregir tipos)
+    // Assigner des événements aux boutons
     if (loginBtn) {
         console.log("Añadiendo evento click al botón login-with-google");
         loginBtn.addEventListener("click", signInWithGoogle);
