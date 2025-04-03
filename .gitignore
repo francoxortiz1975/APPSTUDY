@@ -1,3 +1,5 @@
 #config.js
 #googleConfig.js
+config.example.js
+googleConfig.example.js
 .env.local
