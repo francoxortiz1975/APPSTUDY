@@ -1,10 +1,9 @@
-// Configuración para Google OAuth
+// googleConfig.js
 const googleConfig = {
-  clientId: "157181619799-7bh6g4fkc1ft81m2tr09dec60cn2sktf.apps.googleusercontent.com",
-  // No coloques el client secret aquí, debe mantenerse en el servidor
+  clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 };
 
-// Exponemos la función globalmente para que pueda ser utilizada por auth.js
+// Global function for compatibility
 window.getGoogleClientId = function() {
   return googleConfig.clientId;
-}
+};
