@@ -1,9 +1,12 @@
-// googleConfig.js
 const googleConfig = {
-  clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+  clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
 };
 
-// Global function for compatibility
-window.getGoogleClientId = function() {
-  return googleConfig.clientId;
-};
+export default googleConfig;
+
+// Optional: Global function for compatibility
+if (typeof window !== 'undefined') {
+  window.getGoogleClientId = function() {
+    return googleConfig.clientId;
+  };
+}
