@@ -302,12 +302,6 @@
         </div>
     </div>
     
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
-
     <!-- Configuration Firebase et Google -->
     <script src="config.js"></script>
     <script src="googleConfig.js"></script><!-- Firebase SDK -->
@@ -316,53 +310,39 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
     
-    <!-- Scripts de configuración -->
-    <script src="config.js" type="module"></script>
     <script>
-      // Script para manejar la inicialización de Firebase
-      // Este script se ejecutará después de que los módulos se carguen
-      document.addEventListener('DOMContentLoaded', async () => {
-        try {
-          // Importar la configuración de Firebase dinámicamente
-          const configModule = await import('./config.js');
-          const firebaseConfig = configModule.default;
-          
-          // Importar la configuración de Google dinámicamente
-          const googleConfigModule = await import('./googleConfig.js');
-          const googleConfig = googleConfigModule.default;
-          
-          console.log("Configuración de Firebase cargada", firebaseConfig);
-          
-          // Verificar que tengamos una configuración válida
-          if (firebaseConfig && firebaseConfig.apiKey) {
-            // Inicializar Firebase
-            firebase.initializeApp(firebaseConfig);
-            console.log("Firebase inicializado correctamente");
+        // Script para manejar la inicialización de Firebase
+        document.addEventListener('DOMContentLoaded', () => {
+          try {
+            // Usamos las variables globales en lugar de importar
+            console.log("Verificando configuración global", window.firebaseConfig);
             
-            // Inicializar Analytics si está disponible
-            if (firebase.analytics) {
-              window.analytics = firebase.analytics();
+            // Verificar que tengamos una configuración válida
+            if (window.firebaseConfig && window.firebaseConfig.apiKey) {
+              // Inicializar Firebase con la configuración global
+              firebase.initializeApp(window.firebaseConfig);
+              console.log("Firebase inicializado correctamente");
+              
+              // Inicializar Analytics si está disponible
+              if (firebase.analytics) {
+                window.analytics = firebase.analytics();
+              }
+              
+              // Hacer auth y firestore accesibles globalmente
+              window.auth = firebase.auth();
+              window.db = firebase.firestore();
+              
+              // Evento personalizado para indicar que Firebase está listo
+              window.dispatchEvent(new CustomEvent('firebaseReady'));
+            } else {
+              console.error("Configuración de Firebase inválida o incompleta");
+              console.error("NEXT_PUBLIC_FIREBASE_API_KEY no está definida o no está disponible en el cliente");
             }
-            
-            // Hacer auth y firestore accesibles globalmente
-            window.auth = firebase.auth();
-            window.db = firebase.firestore();
-            
-            // Guardar la configuración de Google si es necesario
-            if (googleConfig && googleConfig.clientId) {
-              window.googleConfig = googleConfig;
-            }
-            
-            // Evento personalizado para indicar que Firebase está listo
-            window.dispatchEvent(new CustomEvent('firebaseReady'));
-          } else {
-            console.error("Configuración de Firebase inválida o incompleta");
+          } catch (error) {
+            console.error("Error al inicializar Firebase:", error);
           }
-        } catch (error) {
-          console.error("Error al inicializar Firebase:", error);
-        }
-      });
-    </script>
+        });
+      </script>
     
     <!-- Scripts de l'application -->
     <script src="firestore.js"></script>

@@ -1,20 +1,19 @@
-// googleConfig.js - Configuración para autenticación de Google con Vercel
-// Compatible con el enfoque de Next.js para variables de entorno
-
+// googleConfig.js - Versión corregida que expone las variables globalmente
 const googleConfig = {
-  // Vercel inyectará esta variable en el cliente cuando se despliegue
   clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 };
 
-// Para Next.js, exportar como default
-export default googleConfig;
-
-// Función para obtener el ID de cliente (para compatibilidad)
-export function getGoogleClientId() {
+// Función para obtener el ID que debe ser accesible globalmente
+function getGoogleClientId() {
   return googleConfig.clientId;
 }
 
-// Para asegurar que la función global está disponible (para compatibilidad)
+// Exponer todo globalmente
 if (typeof window !== 'undefined') {
+  window.googleConfig = googleConfig;
   window.getGoogleClientId = getGoogleClientId;
 }
+
+// Mantener compatibilidad con ES modules
+export default googleConfig;
+export { getGoogleClientId };
