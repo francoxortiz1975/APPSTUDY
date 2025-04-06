@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etudly - Contact</title>
+    <link rel="stylesheet" href="index.css">
+    <!-- Ajout du script EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // https://dashboard.emailjs.com/admin
+            emailjs.init('YOUR_PUBLIC_KEY'); // Remplacez par votre clé publique EmailJS
+        })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="1.png" alt="Logo Etudly">
+                <h1>Etudly</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="home.html">Accueil</a></li>
+                    <li class="active"><a href="contact.html">Contact</a></li>
+                    <li><a href="presskit.html">Press Kit</a></li>
+                    <li class="has-submenu">
+                        <a href="#">Légal</a>
+                        <ul class="submenu">
+                            <li><a href="terms.html">Conditions d'utilisation</a></li>
+                            <li><a href="privacy.html">Politique de confidentialité</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p>&copy; 2025 Etudly</p>
+            </div>
+        </aside>
+
+        <main class="content">
+                        <!-- Seule la partie formulaire est mise à jour, le reste reste inchangé -->
+            <div class="contact-form">
+                <h3>Formulaire de contact</h3>
+                <form id="contact-form" action="#" method="POST">
+                    <div class="form-group">
+                        <label for="name">Nom</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Sujet</label>
+                        <select id="subject" name="subject">
+                            <option value="Support technique">Support technique</option>
+                            <option value="Commentaires">Commentaires</option>
+                            <option value="Partenariat">Partenariat</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="button-primary">Envoyer</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
