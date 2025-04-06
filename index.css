@@ -14,7 +14,7 @@ body {
 /* Styles pour la barre latérale */
 .sidebar {
   width: 250px;
-  background: linear-gradient(165deg, #0d6dea, hsl(238, 75%, 27%));
+  background: linear-gradient(165deg, #2878e0, hsl(238, 75%, 27%));
   color: white;
   padding: 20px 0;
   display: flex;
