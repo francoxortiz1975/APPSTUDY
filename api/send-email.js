@@ -17,23 +17,23 @@ export default async function handler(req, res) {
   try {
     // Configuration de nodemailer
     const transporter = nodemailer.createTransport({
-      service: 'gmail',  // Vous pouvez changer selon votre fournisseur de mail
+      service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER,     // Stocké dans variables d'environnement Vercel
-        pass: process.env.EMAIL_PASSWORD  // Stocké dans variables d'environnement Vercel
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
       }
     });
 
     // Options de l'email
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'contact.etudly@gmail.com',  // Email de destination (vous pouvez le remplacer par process.env.DESTINATION_EMAIL)
+      to: 'contact.etudly@gmail.com',
       subject: `Nouveau message de ${name}: ${subject}`,
       text: `Nom: ${name}\nEmail: ${email}\nSujet: ${subject}\n\nMessage:\n${message}`,
       replyTo: email
     };
 
-    // Envoi de l'email
+    // Envoyer l'email
     await transporter.sendMail(mailOptions);
 
     // Réponse réussie

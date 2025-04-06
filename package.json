@@ -1,9 +1,11 @@
 {
-    "name": "etudly-app",
-    "version": "1.0.0",
-    "description": "Application d'études",
-    "scripts": {
-      "build": "node generate-config.js"
-    },
-    "dependencies": {}
+  "name": "etudly-app",
+  "version": "1.0.0",
+  "description": "Application d'études",
+  "scripts": {
+    "build": "node generate-config.js"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.9"
   }
+}
