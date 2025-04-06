@@ -19,16 +19,39 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Vérifier si l'utilisateur est connecté
     function checkAuth() {
-        if (window.auth && window.auth.currentUser) {
-            // Charger les matières de l'utilisateur
-            loadUserSubjects();
-            
-            // Charger les plans d'études existants
-            loadStudyPlans();
+        // Vérifier d'abord le localStorage pour l'authentification
+        const authToken = localStorage.getItem('etudlyAuthToken');
+        const authUid = localStorage.getItem('etudlyAuthUid');
+        
+        if (authToken && authUid) {
+            console.log("Authentification trouvée dans localStorage:", authUid);
+            // Charger les données utilisateur en utilisant l'ID depuis localStorage
+            loadUserData(authUid);
+        } else if (window.auth && window.auth.currentUser) {
+            console.log("Utilisateur connecté via Firebase:", window.auth.currentUser.uid);
+            // Charger les données utilisateur à partir de l'objet auth de Firebase
+            loadUserData(window.auth.currentUser.uid);
         } else {
+            console.log("Aucune authentification trouvée, redirection vers la page de connexion");
             // Rediriger vers la page de connexion
             window.location.href = "app.html";
         }
+    }
+    
+    // Fonction pour charger les données utilisateur
+    function loadUserData(userId) {
+        if (!userId) {
+            console.error("ID utilisateur non fourni pour charger les données");
+            return;
+        }
+        
+        console.log("Chargement des données pour l'utilisateur:", userId);
+        
+        // Charger les matières de l'utilisateur
+        loadUserSubjects(userId);
+        
+        // Charger les plans d'études existants
+        loadStudyPlans(userId);
     }
     
     // Écouter l'événement Firebase Ready
@@ -37,19 +60,41 @@ document.addEventListener("DOMContentLoaded", () => {
     // Si Firebase est déjà initialisé, vérifier l'authentification
     if (window.auth) {
         checkAuth();
+    } else {
+        console.log("Firebase non initialisé, attente...");
+        // Si Firebase n'est pas encore prêt, on peut mettre en place une vérification différée
+        setTimeout(() => {
+            if (window.auth) {
+                checkAuth();
+            } else {
+                // Vérifier quand même l'authentification via localStorage
+                const authToken = localStorage.getItem('etudlyAuthToken');
+                const authUid = localStorage.getItem('etudlyAuthUid');
+                
+                if (authToken && authUid) {
+                    console.log("Tentative de chargement des données via localStorage malgré Firebase non initialisé");
+                    loadUserData(authUid);
+                }
+            }
+        }, 1000);
     }
     
     // Charger les matières depuis Firestore
-    function loadUserSubjects() {
-        if (!window.auth.currentUser) return;
+    function loadUserSubjects(userId) {
+        if (!userId) return;
         
-        const userId = window.auth.currentUser.uid;
+        if (!window.db) {
+            console.error("Firestore non initialisé");
+            return;
+        }
         
         window.db.collection("users").doc(userId).get()
             .then((doc) => {
                 if (doc.exists && doc.data().subjects) {
                     subjects = doc.data().subjects;
                     populateSubjectsDropdown();
+                } else {
+                    console.log("Pas de matières trouvées pour cet utilisateur");
                 }
             })
             .catch((error) => {
@@ -79,10 +124,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     // Charger les plans d'études existants
-    function loadStudyPlans() {
-        if (!window.auth.currentUser) return;
+    function loadStudyPlans(userId) {
+        if (!userId) return;
         
-        const userId = window.auth.currentUser.uid;
+        if (!window.db) {
+            console.error("Firestore non initialisé");
+            return;
+        }
         
         window.db.collection("users").doc(userId).collection("studyPlans").get()
             .then((querySnapshot) => {
@@ -94,6 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         const plan = doc.data();
                         createStudyPlanItem(doc.id, plan);
                     });
+                } else {
+                    console.log("Pas de plans d'études trouvés pour cet utilisateur");
                 }
             })
             .catch((error) => {
@@ -214,9 +264,21 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Fonction globale pour marquer une session comme terminée/non terminée
     window.toggleSessionComplete = function(planId, sessionIndex, completed) {
-        if (!window.auth.currentUser) return;
+        // Obtenir l'ID utilisateur soit de Firebase soit de localStorage
+        const userId = window.auth && window.auth.currentUser 
+            ? window.auth.currentUser.uid 
+            : localStorage.getItem('etudlyAuthUid');
+            
+        if (!userId) {
+            console.error("Impossible de mettre à jour la session: utilisateur non identifié");
+            return;
+        }
         
-        const userId = window.auth.currentUser.uid;
+        if (!window.db) {
+            console.error("Firestore non initialisé");
+            return;
+        }
+        
         const planRef = window.db.collection("users").doc(userId).collection("studyPlans").doc(planId);
         
         planRef.get().then((doc) => {
@@ -229,7 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         sessions: plan.sessions
                     }).then(() => {
                         // Mettre à jour la liste des plans d'études
-                        loadStudyPlans();
+                        loadStudyPlans(userId);
                     });
                 }
             }
@@ -425,9 +487,17 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("exam-details-form").addEventListener("submit", function(e) {
         e.preventDefault();
         
-        if (!window.auth.currentUser) return;
+        // Obtenir l'ID utilisateur soit de Firebase soit de localStorage
+        const userId = window.auth && window.auth.currentUser 
+            ? window.auth.currentUser.uid 
+            : localStorage.getItem('etudlyAuthUid');
+            
+        if (!userId) {
+            console.error("Impossible de créer un plan d'études: utilisateur non identifié");
+            alert("Vous devez être connecté pour créer un plan d'études.");
+            return;
+        }
         
-        const userId = window.auth.currentUser.uid;
         const subjectIndex = examSubjectSelect.value;
         
         if (subjectIndex === "" || !subjects[subjectIndex]) {
@@ -527,13 +597,22 @@ document.addEventListener("DOMContentLoaded", () => {
             if (studyPlan.sessions.length >= 10) break;
         }
         
+        // Vérifier si Firestore est initialisé
+        if (!window.db) {
+            console.error("Firestore non initialisé");
+            alert("Une erreur s'est produite. Veuillez réessayer ultérieurement.");
+            generatePlanButton.disabled = false;
+            generatePlanButton.textContent = "Générer mon plan d'études";
+            return;
+        }
+        
         // Sauvegarder le plan d'études dans Firestore
         window.db.collection("users").doc(userId).collection("studyPlans").add(studyPlan)
             .then((docRef) => {
                 console.log("Plan d'études créé avec ID:", docRef.id);
                 
                 // Charger les plans d'études
-                loadStudyPlans();
+                loadStudyPlans(userId);
                 
                 // Réinitialiser le formulaire
                 document.getElementById("exam-details-form").reset();
@@ -562,25 +641,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const formattedToday = today.toISOString().split('T')[0];
     examDateInput.min = formattedToday;
     
-    // Si la barre latérale a déjà été programmée ailleurs, pas besoin de réécrire le code
-    // Si ce n'est pas le cas, ajoutez le code pour la gestion mobile de la barre latérale ici
+    // Gestion de la barre latérale en mode mobile
+    const toggleSidebarBtn = document.querySelector('.toggle-sidebar');
+    const sidebar = document.querySelector('.sidebar');
     
-    // Gestion de la barre latérale en mode mobile (si pas déjà défini ailleurs)
-    if (typeof window.toggleSidebar !== 'function') {
-        const toggleSidebarBtn = document.querySelector('.toggle-sidebar');
-        const sidebar = document.querySelector('.sidebar');
+    if (toggleSidebarBtn && sidebar) {
+        toggleSidebarBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('show');
+        });
         
-        if (toggleSidebarBtn && sidebar) {
-            toggleSidebarBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-            });
-            
-            // Fermer la barre latérale si on clique en dehors
-            document.addEventListener('click', function(event) {
-                if (!sidebar.contains(event.target) && event.target !== toggleSidebarBtn && window.innerWidth <= 768) {
-                    sidebar.classList.remove('show');
-                }
-            });
-        }
+        // Fermer la barre latérale si on clique en dehors
+        document.addEventListener('click', function(event) {
+            if (!sidebar.contains(event.target) && event.target !== toggleSidebarBtn && window.innerWidth <= 768) {
+                sidebar.classList.remove('show');
+            }
+        });
     }
 });
