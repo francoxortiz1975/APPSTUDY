@@ -37,6 +37,51 @@ document.addEventListener("DOMContentLoaded", () => {
     let editingSubjectIndex = -1; // Para seguir si estamos editando una materia existente
     let editingGradeIndex = -1; // Pour suivre si nous modifions une note existante
 
+
+   
+
+// Ajoutez aussi un listener pour fermer la barre latérale en cliquant en dehors
+document.addEventListener('click', function(event) {
+
+     // Gestion de la barre latérale en mode mobile
+     const toggleSidebarBtn = document.querySelector('.toggle-sidebar');
+     const sidebar = document.querySelector('.sidebar');
+ 
+     if (toggleSidebarBtn) {
+         toggleSidebarBtn.addEventListener('click', function() {
+             sidebar.classList.toggle('show');
+         });
+     }
+ 
+     // Fermer la barre latérale lorsqu'on clique sur un élément du menu en mode mobile
+     const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+     sidebarLinks.forEach(link => {
+         link.addEventListener('click', function() {
+             if (window.innerWidth <= 768) {
+                 sidebar.classList.remove('show');
+             }
+         });
+     });
+});
+
+// Gestion du bouton retour sur mobile pour fermer la sidebar
+window.addEventListener('popstate', function(event) {
+    if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
+        event.preventDefault();
+        sidebar.classList.remove('show');
+        history.pushState(null, document.title, window.location.href);
+    }
+});
+
+// On crée un état initial pour pouvoir revenir en arrière
+history.pushState(null, document.title, window.location.href);
+
+
+
+
+
+
+
     // Create progress bar inner div
     const progressBarInner = document.createElement("div");
     progressBar.appendChild(progressBarInner);

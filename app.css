@@ -738,18 +738,23 @@ button:hover {
   font-size: 1rem;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
+    position: fixed;
+    z-index: 1100; /* Valeur plus élevée pour s'assurer qu'elle apparaît au-dessus des autres éléments */
+    width: 270px;
   }
   
   .sidebar.show {
     transform: translateX(0);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Ajouter une ombre pour mettre en évidence la sidebar */
   }
   
   .main-content {
     margin-left: 0;
+    width: 100%;
   }
   
   .toggle-sidebar {
@@ -791,5 +796,8 @@ button:hover {
   
   .subject-item, .grade-item {
     padding: 12px;
+
+
   }
 }
+
