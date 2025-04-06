@@ -311,32 +311,23 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
     
     <script>
-        // Script para manejar la inicialización de Firebase
+        // Script para inicializar Firebase
         document.addEventListener('DOMContentLoaded', () => {
           try {
-            // Usamos las variables globales en lugar de importar
-            console.log("Verificando configuración global", window.firebaseConfig);
-            
-            // Verificar que tengamos una configuración válida
+            // Verificar que tengamos la configuración
             if (window.firebaseConfig && window.firebaseConfig.apiKey) {
               // Inicializar Firebase con la configuración global
               firebase.initializeApp(window.firebaseConfig);
               console.log("Firebase inicializado correctamente");
               
-              // Inicializar Analytics si está disponible
-              if (firebase.analytics) {
-                window.analytics = firebase.analytics();
-              }
-              
               // Hacer auth y firestore accesibles globalmente
               window.auth = firebase.auth();
               window.db = firebase.firestore();
               
-              // Evento personalizado para indicar que Firebase está listo
+              // Evento para indicar que Firebase está listo
               window.dispatchEvent(new CustomEvent('firebaseReady'));
             } else {
-              console.error("Configuración de Firebase inválida o incompleta");
-              console.error("NEXT_PUBLIC_FIREBASE_API_KEY no está definida o no está disponible en el cliente");
+              console.error("Error: Configuración de Firebase no disponible");
             }
           } catch (error) {
             console.error("Error al inicializar Firebase:", error);
