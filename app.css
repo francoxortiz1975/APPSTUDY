@@ -801,3 +801,348 @@ button:hover {
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Styles pour la page Plan d'Études */
+#study-plan-page {
+  display: block !important;
+}
+
+.plan-intro {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.plan-intro p {
+  max-width: 700px;
+  margin: 0 auto;
+  color: #6c757d;
+}
+
+.upload-section, .exam-details-section, .study-plans-section {
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #eee;
+}
+
+.upload-container {
+  margin-top: 20px;
+}
+
+.upload-box {
+  border: 2px dashed #ced4da;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.upload-box:hover, .upload-box.dragover {
+  border-color: #0d6dea;
+  background-color: rgba(13, 109, 234, 0.05);
+}
+
+.upload-box svg {
+  display: block;
+  margin: 0 auto 15px;
+  color: #6c757d;
+}
+
+.upload-box p {
+  margin-bottom: 15px;
+  color: #495057;
+}
+
+.upload-info {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 15px;
+}
+
+.uploaded-files {
+  margin-top: 20px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.file-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-icon {
+  margin-right: 15px;
+  color: #6c757d;
+}
+
+.file-info {
+  flex: 1;
+}
+
+.file-name {
+  font-weight: 500;
+  margin-bottom: 3px;
+}
+
+.file-size {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.file-status {
+  margin-left: 10px;
+  font-size: 0.85rem;
+}
+
+.file-status.pending {
+  color: #ffc107;
+}
+
+.file-status.success {
+  color: #28a745;
+}
+
+.file-status.error {
+  color: #dc3545;
+}
+
+.file-actions {
+  margin-left: 10px;
+}
+
+.file-delete {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 5px;
+  margin: 0;
+  box-shadow: none;
+}
+
+.file-delete:hover {
+  color: #c82333;
+}
+
+/* Styles pour le formulaire */
+.study-plan-form {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-group select, 
+.form-group input[type="date"],
+.form-group input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-family: 'Prompt', sans-serif;
+}
+
+/* Styles pour les jours de la semaine */
+.weekdays-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.day-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.day-checkbox input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+/* Styles pour le slider de difficulté */
+.difficulty-slider {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.difficulty-slider input[type="range"] {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.difficulty-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* Styles pour la liste des plans d'études */
+.study-plan-item {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.study-plan-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.plan-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.plan-date {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.plan-progress {
+  margin-top: 15px;
+}
+
+.progress-bar-container {
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #28a745;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* Styles pour le popup de détails du plan */
+.plan-details-form {
+  width: 90%;
+  max-width: 800px;
+}
+
+.plan-dates {
+  text-align: center;
+  margin-bottom: 20px;
+  font-style: italic;
+  color: #6c757d;
+}
+
+.plan-calendar {
+  margin-bottom: 30px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.plan-sessions {
+  margin-bottom: 20px;
+}
+
+.session-item {
+  background-color: #f8f9fa;
+  border-left: 4px solid #0d6dea;
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.session-title {
+  font-weight: 600;
+  margin: 0;
+}
+
+.session-date {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.session-content {
+  color: #495057;
+}
+
+.session-completed {
+  border-left-color: #28a745;
+  opacity: 0.8;
+}
+
+.session-completed .session-title {
+  text-decoration: line-through;
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+  .weekdays-selector {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .plan-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .plan-date {
+    margin-top: 5px;
+  }
+}
