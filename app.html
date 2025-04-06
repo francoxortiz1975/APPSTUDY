@@ -310,17 +310,58 @@
 
     <!-- Configuration Firebase et Google -->
     <script src="config.js"></script>
-    <script src="googleConfig.js"></script>
+    <script src="googleConfig.js"></script><!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
+    
+    <!-- Scripts de configuración -->
+    <script src="config.js" type="module"></script>
     <script>
-        // Initialiser Firebase
-        firebase.initializeApp(firebaseConfig);
-        
-        // Initialiser Analytics
-        const analytics = firebase.analytics();
-        
-        // Rendre auth et firestore accessibles globalement
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+      // Script para manejar la inicialización de Firebase
+      // Este script se ejecutará después de que los módulos se carguen
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // Importar la configuración de Firebase dinámicamente
+          const configModule = await import('./config.js');
+          const firebaseConfig = configModule.default;
+          
+          // Importar la configuración de Google dinámicamente
+          const googleConfigModule = await import('./googleConfig.js');
+          const googleConfig = googleConfigModule.default;
+          
+          console.log("Configuración de Firebase cargada", firebaseConfig);
+          
+          // Verificar que tengamos una configuración válida
+          if (firebaseConfig && firebaseConfig.apiKey) {
+            // Inicializar Firebase
+            firebase.initializeApp(firebaseConfig);
+            console.log("Firebase inicializado correctamente");
+            
+            // Inicializar Analytics si está disponible
+            if (firebase.analytics) {
+              window.analytics = firebase.analytics();
+            }
+            
+            // Hacer auth y firestore accesibles globalmente
+            window.auth = firebase.auth();
+            window.db = firebase.firestore();
+            
+            // Guardar la configuración de Google si es necesario
+            if (googleConfig && googleConfig.clientId) {
+              window.googleConfig = googleConfig;
+            }
+            
+            // Evento personalizado para indicar que Firebase está listo
+            window.dispatchEvent(new CustomEvent('firebaseReady'));
+          } else {
+            console.error("Configuración de Firebase inválida o incompleta");
+          }
+        } catch (error) {
+          console.error("Error al inicializar Firebase:", error);
+        }
+      });
     </script>
     
     <!-- Scripts de l'application -->
