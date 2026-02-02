@@ -1,12 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Hacer subjects global para acceder desde las funciones de autenticación
     window.subjects = [];
-    
+
+    // Sistema de calificación - por defecto /20 (Francia)
+    // Valores posibles: 20, 100, 10
+    window.gradingScale = 20;
+
     // Hacer todas las funciones globales para que estén disponibles desde cualquier script
     window.renderSubjects = renderSubjects;
     window.updateFinalScore = updateFinalScore;
     window.showSubjectDetails = showSubjectDetails;
     window.calculateSubjectScore = calculateSubjectScore;
+    window.setGradingScale = setGradingScale;
+    window.getGradingScale = getGradingScale;
     
     // Main page elements
     const mainPage = document.getElementById("calculator-page");
@@ -32,7 +38,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const gradePopup = document.getElementById("grade-popup");
     const gradePopupSubmit = document.getElementById("grade-popup-submit");
     const gradePopupClose = document.getElementById("grade-popup-close");
-    
+
+    // Grading Scale Popup Elements
+    const gradingScaleBtn = document.getElementById("grading-scale-btn");
+    const gradingScalePopup = document.getElementById("grading-scale-popup");
+    const gradingScaleClose = document.getElementById("grading-scale-close");
+    const scaleOptions = document.querySelectorAll(".scale-option");
+
     let currentSubjectIndex = -1;
     let editingSubjectIndex = -1; // Para seguir si estamos editando una materia existente
     let editingGradeIndex = -1; // Pour suivre si nous modifions une note existante
@@ -133,20 +145,23 @@ history.pushState(null, document.title, window.location.href);
     addGradeInDetailsBtn.addEventListener("click", () => {
         // Reset editing state
         editingGradeIndex = -1;
-        
+
         // Change popup title
         document.querySelector("#grade-popup-form h3").textContent = "Ajouter une Note";
         document.getElementById("grade-popup-submit").textContent = "Ajouter";
-        
+
+        // Actualizar el label del input según la escala actual
+        updateGradeInputLabel();
+
         gradePopup.style.display = "flex";
         gradePopup.classList.add("active");
-        
+
         // Reset form
         document.getElementById("grade-name").value = "";
         document.getElementById("grade-value").value = "";
         document.getElementById("other-grade-percentage").style.display = "none";
         document.getElementById("grade-percentage").value = "";
-        
+
         // Deselect all percentage buttons
         document.querySelectorAll('.grade-percentage-btn').forEach(btn => {
             btn.classList.remove('active');
@@ -160,6 +175,195 @@ history.pushState(null, document.title, window.location.href);
             gradePopup.style.display = "none";
         }, 300);
     });
+
+    // Open grading scale popup
+    if (gradingScaleBtn) {
+        gradingScaleBtn.addEventListener("click", () => {
+            // Marcar la opción activa actual
+            scaleOptions.forEach(opt => {
+                opt.classList.remove("active");
+                if (parseInt(opt.dataset.scale) === window.gradingScale) {
+                    opt.classList.add("active");
+                }
+            });
+            gradingScalePopup.style.display = "flex";
+            gradingScalePopup.classList.add("active");
+        });
+    }
+
+    // Close grading scale popup
+    if (gradingScaleClose) {
+        gradingScaleClose.addEventListener("click", () => {
+            gradingScalePopup.classList.remove("active");
+            setTimeout(() => {
+                gradingScalePopup.style.display = "none";
+            }, 300);
+        });
+    }
+
+    // Handle scale option selection
+    scaleOptions.forEach(option => {
+        option.addEventListener("click", () => {
+            const newScale = parseInt(option.dataset.scale);
+            setGradingScale(newScale);
+
+            // Actualizar UI del popup
+            scaleOptions.forEach(opt => opt.classList.remove("active"));
+            option.classList.add("active");
+
+            // Cerrar popup después de seleccionar
+            setTimeout(() => {
+                gradingScalePopup.classList.remove("active");
+                setTimeout(() => {
+                    gradingScalePopup.style.display = "none";
+                }, 300);
+            }, 200);
+        });
+    });
+
+    // Función para cambiar el sistema de calificación
+    function setGradingScale(scale) {
+        window.gradingScale = scale;
+
+        // Actualizar el label del botón
+        const scaleLabel = document.getElementById("current-scale-label");
+        if (scaleLabel) {
+            if (scale === 100) {
+                scaleLabel.textContent = "%";
+            } else {
+                scaleLabel.textContent = "/" + scale;
+            }
+        }
+
+        // Actualizar el label del score final
+        const finalScaleLabel = document.getElementById("final-score-scale");
+        if (finalScaleLabel) {
+            if (scale === 100) {
+                finalScaleLabel.textContent = "%";
+            } else {
+                finalScaleLabel.textContent = "/" + scale;
+            }
+        }
+
+        // Actualizar el label del input de nota en el popup
+        updateGradeInputLabel();
+
+        // Re-renderizar todo con la nueva escala
+        renderSubjects();
+
+        // Si estamos viendo detalles de una materia, actualizar también
+        if (currentSubjectIndex !== -1 && window.subjects[currentSubjectIndex]) {
+            showSubjectDetails(window.subjects[currentSubjectIndex]);
+        }
+
+        // Guardar preferencia en Firestore
+        if (typeof auth !== 'undefined' && auth && auth.currentUser) {
+            saveGradingScalePreference(scale);
+        }
+    }
+
+    // Función para obtener el sistema de calificación actual
+    function getGradingScale() {
+        return window.gradingScale;
+    }
+
+    // Función para actualizar el label del input de nota
+    function updateGradeInputLabel() {
+        const label = document.getElementById("grade-value-label");
+        const input = document.getElementById("grade-value");
+        if (label && input) {
+            if (window.gradingScale === 100) {
+                label.textContent = "Note (%)";
+            } else {
+                label.textContent = "Note (/" + window.gradingScale + "):";
+            }
+            input.max = window.gradingScale;
+        }
+    }
+
+    // Función para convertir una nota de escala /20 a la escala actual
+    function convertFromBase(value) {
+        return (value / 20) * window.gradingScale;
+    }
+
+    // Función para convertir una nota de la escala actual a /20 (para almacenamiento)
+    function convertToBase(value) {
+        return (value / window.gradingScale) * 20;
+    }
+
+    // Función para formatear la nota según la escala actual
+    function formatGrade(valueIn20) {
+        const converted = convertFromBase(valueIn20);
+        if (window.gradingScale === 100) {
+            return converted.toFixed(1) + "%";
+        } else {
+            return converted.toFixed(2) + "/" + window.gradingScale;
+        }
+    }
+
+    // Función para guardar la preferencia de escala en Firestore
+    function saveGradingScalePreference(scale) {
+        if (typeof db === 'undefined' || !db) return;
+
+        const userId = auth.currentUser.uid;
+        const userRef = db.collection('users').doc(userId);
+
+        userRef.update({
+            gradingScale: scale
+        }).then(() => {
+            console.log("Preferencia de escala guardada:", scale);
+        }).catch((error) => {
+            console.error("Error al guardar preferencia de escala:", error);
+        });
+    }
+
+    // Función para cargar la preferencia de escala desde Firestore
+    function loadGradingScalePreference() {
+        if (typeof db === 'undefined' || !db) return;
+        if (typeof auth === 'undefined' || !auth || !auth.currentUser) return;
+
+        const userId = auth.currentUser.uid;
+        const userRef = db.collection('users').doc(userId);
+
+        userRef.get().then((doc) => {
+            if (doc.exists && doc.data().gradingScale) {
+                const scale = doc.data().gradingScale;
+                window.gradingScale = scale;
+
+                // Actualizar UI del botón
+                const scaleLabel = document.getElementById("current-scale-label");
+                if (scaleLabel) {
+                    if (scale === 100) {
+                        scaleLabel.textContent = "%";
+                    } else {
+                        scaleLabel.textContent = "/" + scale;
+                    }
+                }
+
+                // Actualizar label del score final
+                const finalScaleLabel = document.getElementById("final-score-scale");
+                if (finalScaleLabel) {
+                    if (scale === 100) {
+                        finalScaleLabel.textContent = "%";
+                    } else {
+                        finalScaleLabel.textContent = "/" + scale;
+                    }
+                }
+
+                updateGradeInputLabel();
+
+                // Re-renderizar con la escala cargada
+                if (typeof window.renderSubjects === 'function') {
+                    renderSubjects();
+                }
+            }
+        }).catch((error) => {
+            console.error("Error al cargar preferencia de escala:", error);
+        });
+    }
+
+    // Hacer loadGradingScalePreference global
+    window.loadGradingScalePreference = loadGradingScalePreference;
 
     // Gestion de la sélection de type de pondération
     const weightingTypeButtons = document.querySelectorAll('.weighting-btn');
@@ -321,12 +525,12 @@ history.pushState(null, document.title, window.location.href);
     // Add or update grade from popup - MODIFICADO para Firebase
     gradePopupSubmit.addEventListener('click', () => {
         const gradeName = document.getElementById('grade-name').value;
-        const gradeValue = parseFloat(document.getElementById('grade-value').value);
-        
+        const gradeValueInput = parseFloat(document.getElementById('grade-value').value);
+
         // Get percentage value either from selected button or custom input
         let gradePercentage;
         const activePercentageBtn = document.querySelector('.grade-percentage-btn.active');
-        
+
         if (activePercentageBtn) {
             if (activePercentageBtn.dataset.other === 'true') {
                 gradePercentage = parseFloat(document.getElementById('other-grade-percentage').value);
@@ -338,14 +542,17 @@ history.pushState(null, document.title, window.location.href);
             gradePercentage = parseFloat(document.getElementById('grade-percentage').value);
         }
 
-        if (currentSubjectIndex !== -1 && gradeName && 
-            !isNaN(gradeValue) && gradeValue >= 0 && gradeValue <= 20 && 
+        // Convertir la nota de la escala actual a /20 para almacenamiento
+        const gradeValue = convertToBase(gradeValueInput);
+
+        if (currentSubjectIndex !== -1 && gradeName &&
+            !isNaN(gradeValueInput) && gradeValueInput >= 0 && gradeValueInput <= window.gradingScale &&
             !isNaN(gradePercentage) && gradePercentage > 0) {
-            
-            const grade = { 
-                name: gradeName, 
-                value: gradeValue, 
-                percentage: gradePercentage 
+
+            const grade = {
+                name: gradeName,
+                value: gradeValue, // Guardado en escala /20
+                percentage: gradePercentage
             };
 
             if (editingGradeIndex !== -1) {
@@ -487,14 +694,17 @@ history.pushState(null, document.title, window.location.href);
             const subject = window.subjects[currentSubjectIndex];
             const grade = subject.grades[gradeIndex];
             editingGradeIndex = gradeIndex;
-            
+
             // Cambiar título del popup y botón
             document.querySelector("#grade-popup-form h3").textContent = "Modifier la Note";
             document.getElementById("grade-popup-submit").textContent = "Enregistrer";
-            
-            // Rellenar el formulario
+
+            // Actualizar el label del input según la escala actual
+            updateGradeInputLabel();
+
+            // Rellenar el formulario (convertir de /20 a la escala actual)
             document.getElementById("grade-name").value = grade.name;
-            document.getElementById("grade-value").value = grade.value;
+            document.getElementById("grade-value").value = convertFromBase(grade.value).toFixed(2);
             document.getElementById("grade-percentage").value = grade.percentage;
             
             // Intentar seleccionar el botón de porcentaje correspondiente
@@ -593,9 +803,13 @@ history.pushState(null, document.title, window.location.href);
                 scoreCircle.style.alignItems = "center";
                 scoreCircle.style.marginBottom = "8px";
                 scoreCircle.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
-                
+
+                // Convertir la nota a la escala actual
+                const displayScore = convertFromBase(subjectScore);
+                const scaleLabel = window.gradingScale === 100 ? "%" : "/" + window.gradingScale;
+
                 scoreCircle.innerHTML = `
-                    <span style="font-size: 1.2rem; font-weight: bold; color: ${statusColor};">${subjectScore.toFixed(1)}</span>
+                    <span style="font-size: 1.2rem; font-weight: bold; color: ${statusColor};">${displayScore.toFixed(1)}</span>
                     <span style="font-size: 0.6rem; color: #666;">${getGradeStatus(subjectScore)}</span>
                 `;
                 
@@ -686,11 +900,14 @@ function showSubjectDetails(subject) {
 
         // Set subject title and current score
         document.getElementById("subject-details-title").textContent = subject.name;
-        
+
         // Calculate and display subject score
         const subjectScore = calculateSubjectScore(subject);
-        
-        document.getElementById("subject-current-score").textContent = `${subjectScore.toFixed(2)} / 20`;
+
+        // Convertir a la escala actual
+        const displayScore = convertFromBase(subjectScore);
+        const scaleLabel = window.gradingScale === 100 ? "%" : " / " + window.gradingScale;
+        document.getElementById("subject-current-score").textContent = `${displayScore.toFixed(2)}${scaleLabel}`;
    
         // Render grades list
         subjectGradesList.innerHTML = "";
@@ -727,7 +944,8 @@ function showSubjectDetails(subject) {
                     <span style="font-size: 0.85rem; color: #6c757d;">${grade.percentage}%</span>
                 `;
                 
-                // Middle with grade value
+                // Middle with grade value (convertir a la escala actual)
+                const displayGradeValue = convertFromBase(grade.value);
                 const gradeValueDisplay = document.createElement('div');
                 gradeValueDisplay.style.display = "flex";
                 gradeValueDisplay.style.alignItems = "center";
@@ -739,7 +957,7 @@ function showSubjectDetails(subject) {
                 gradeValueDisplay.style.color = "white";
                 gradeValueDisplay.style.fontWeight = "bold";
                 gradeValueDisplay.style.marginRight = "10px";
-                gradeValueDisplay.textContent = grade.value;
+                gradeValueDisplay.textContent = displayGradeValue.toFixed(1);
                 
                 // Right side with action buttons
                 const actionSide = document.createElement('div');
@@ -855,9 +1073,12 @@ function showSubjectDetails(subject) {
         });
 
         const score = weightSum > 0 ? (total / weightSum) : 0;
-        finalScore.textContent = score.toFixed(2);
-        
-        // Update progress bar
+
+        // Convertir a la escala actual para mostrar
+        const displayScore = convertFromBase(score);
+        finalScore.textContent = displayScore.toFixed(2);
+
+        // Update progress bar (siempre usa el porcentaje real)
         progressBarInner.style.width = `${(score / 20) * 100}%`;
         
         // Change progress bar color based on score
@@ -870,13 +1091,17 @@ function showSubjectDetails(subject) {
     // Inicializar la aplicación - Verificar si el usuario ya está autenticado al cargar
     function initializeApp() {
         console.log("Inicializando aplicación...");
-        
+
         // Verificar si auth está definido y si hay un usuario autenticado
         if (typeof auth !== 'undefined') {
             console.log("Auth está definido");
             if (auth.currentUser) {
                 console.log("Usuario autenticado:", auth.currentUser.uid);
                 loadUserData(auth.currentUser.uid);
+                // Cargar preferencia de escala después de un pequeño delay
+                setTimeout(() => {
+                    loadGradingScalePreference();
+                }, 500);
             } else {
                 console.log("No hay usuario autenticado, renderizando materias vacías");
                 window.subjects = window.subjects || [];
@@ -888,7 +1113,7 @@ function showSubjectDetails(subject) {
             setTimeout(initializeApp, 1000);
         }
     }
-    
+
     // Llamar a la función de inicialización
     initializeApp();
 });
