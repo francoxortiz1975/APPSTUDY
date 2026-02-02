@@ -2,12 +2,12 @@
 
 ## Project Overview
 
-Student grade tracker web application with Google OAuth authentication. Users can manage courses (subjects), add grades with weighted percentages, and track their overall academic performance.
+Student grade tracker web application with Google OAuth authentication. Users can manage courses (subjects), add grades with weighted percentages, and track their overall academic performance. The app also includes a Study Plan feature for exam preparation.
 
 ## Tech Stack
 
 - **Frontend**: Vanilla JavaScript, HTML5, CSS3
-- **Backend**: Firebase (Auth, Firestore)
+- **Backend**: Firebase (Auth, Firestore, Storage)
 - **Deployment**: Vercel (with serverless functions)
 - **No frameworks** - Pure JS with modular file structure
 
@@ -15,25 +15,85 @@ Student grade tracker web application with Google OAuth authentication. Users ca
 
 ```
 /
-├── index.html          # Landing page with auth
-├── app.html            # Main application (authenticated)
-├── app.js              # Core logic: grading calculations, UI rendering
-├── app.css             # Application styles
-├── auth.js             # Firebase Auth (Google OAuth + Email/Password)
-├── auth-manager.js     # Auth state management
-├── firestore.js        # Firestore database operations
-├── config.js           # Firebase configuration (uses .env)
-├── api/
-│   └── send-email.js   # Vercel serverless function for contact form
-└── .env                # Environment variables (not committed)
+├── index.html              # Landing page
+├── app.html                # Grade Calculator feature
+├── study-plan.html         # Study Plan feature
+├── app.js                  # Grade calculator logic
+├── study-plan.js           # Study plan logic
+├── app.css                 # Application styles (shared)
+│
+├── src/                    # Modular source code
+│   ├── core/               # Shared core modules
+│   │   ├── state.js        # Global state management (AppState)
+│   │   └── grading-utils.js # Grade conversion utilities
+│   ├── shared/             # Shared UI components
+│   │   └── grading-scale-ui.js # Grading scale selector
+│   ├── features/           # Feature-specific code (future)
+│   │   ├── grade-calculator/
+│   │   └── study-plan/
+│   └── styles/             # CSS modules (future)
+│
+├── auth.js                 # Firebase Auth (Google OAuth + Email/Password)
+├── auth-manager.js         # Auth state management
+├── firestore.js            # Firestore database operations
+├── config.js               # Firebase configuration (uses .env)
+│
+├── api/                    # Vercel serverless functions
+│   └── send-email.js       # Contact form email
+│
+├── public/                 # Static pages
+│   └── (terms.html, privacy.html, etc.)
+│
+└── .env                    # Environment variables (not committed)
 ```
 
 ## Core Architecture
 
-### State Management
-- **Global state**: `window.subjects` array holds all courses and grades
-- **Persistence**: Firebase Firestore + localStorage fallback
-- **No Redux/Context** - direct window object manipulation
+### Modular State Management
+
+The app uses a centralized state management system in `src/core/state.js`:
+
+```javascript
+window.AppState = {
+    gradingScale: 20,      // Current grading scale (20, 100, or 10)
+    subjects: [],          // All courses and grades
+
+    setGradingScale(scale) // Change scale + persist
+    getGradingScale()      // Get current scale
+    setSubjects(subjects)  // Update subjects
+    getSubjects()          // Get subjects
+    subscribe(key, cb)     // Listen for changes
+    loadFromFirestore()    // Load user preferences
+    clear()                // Reset on logout
+}
+```
+
+### Grading Utilities (`src/core/grading-utils.js`)
+
+```javascript
+window.GradingUtils = {
+    convertFromBase(value)     // /20 -> current scale
+    convertToBase(value)       // current scale -> /20
+    formatGrade(valueIn20)     // Format for display
+    getScaleLabel()            // Get "%" or "/20" or "/10"
+    getGradeStatus(score)      // "Excellent", "Bien", etc.
+    getGradeColor(score)       // Status color
+    calculateSubjectScore(subj) // Subject average
+    calculateFinalScore(subjs)  // Overall average
+}
+```
+
+### Shared UI (`src/shared/grading-scale-ui.js`)
+
+```javascript
+window.GradingScaleUI = {
+    init()                  // Setup event listeners
+    openPopup()             // Show scale selector
+    closePopup()            // Hide selector
+    selectScale(scale)      // User selects scale
+    updateAllScaleLabels()  // Refresh UI labels
+}
+```
 
 ### Data Model
 
@@ -47,10 +107,10 @@ Student grade tracker web application with Google OAuth authentication. Users ca
   grades: Grade[]
 }
 
-// Grade
+// Grade (stored in /20 scale internally)
 {
   name: string,              // e.g., "Midterm Exam"
-  value: number,             // Score (0-20 scale)
+  value: number,             // Score (always 0-20 for storage)
   percentage: number         // Weight of this grade in subject (%)
 }
 ```
@@ -61,59 +121,72 @@ Student grade tracker web application with Google OAuth authentication. Users ca
 /users/{userId}
   ├── displayName, email, photoURL
   ├── createdAt, updatedAt
-  └── subjects: Subject[]
+  ├── gradingScale: number    # User's preferred scale (20, 100, 10)
+  ├── subjects: Subject[]
+  └── studyPlans/             # Subcollection
+      └── {planId}
+          ├── subject, examDate, studyHours
+          ├── sessions: Session[]
+          └── ...
 ```
 
-## Grading System
+## Features
 
-### Current Implementation (French /20 Scale)
+### 1. Grade Calculator (`app.html`, `app.js`)
 
-All grades are on a **0-20 scale**. Key functions in `app.js`:
+- Add/edit/delete courses with weighted percentages or ECTS
+- Add/edit/delete grades within courses
+- Automatic weighted average calculation
+- Color-coded status (Excellent, Bien, Passable, Échec)
+- Progress bar visualization
 
-- `calculateSubjectScore(subject)` (line ~802): Weighted average of grades within a subject
-- `updateFinalScore()` (line ~843): Weighted average of all subjects
+### 2. Grading Scale System
 
-### Score Calculation Logic
+Supports multiple grading scales with automatic conversion:
 
-```javascript
-// Subject score = weighted average of grades
-subjectScore = Σ(grade.value × grade.percentage) / 100
+| Scale | Range | Label |
+|-------|-------|-------|
+| French | 0-20 | /20 |
+| Percentage | 0-100 | % |
+| Decimal | 0-10 | /10 |
 
-// Final score = weighted average of subjects
-finalScore = Σ(subjectScore × subject.weight) / Σ(subject.weight)
-```
+**Persistence:**
+- Saved in `localStorage` (immediate)
+- Saved in Firestore `users/{uid}.gradingScale`
+- Persists across page navigation
 
-### Color Coding (French Scale)
-- **Green** (Excellent): >= 16/20
-- **Cyan** (Very Good): >= 14/20
-- **Light Blue** (Good): >= 12/20
-- **Yellow** (Pass): >= 10/20
-- **Red** (Fail): < 10/20
+### 3. Study Plan (`study-plan.html`, `study-plan.js`)
 
-### Progress Bar
-- Scales score to percentage: `(score / 20) * 100%`
+- Upload course documents (PDF, Word, TXT)
+- Select subject from existing courses
+- Set exam date and study hours
+- Generate study sessions
+- Track completion progress
 
 ## Key Global Functions
 
 ```javascript
-window.subjects              // Course array
-window.renderSubjects()      // Re-render subject list
-window.updateFinalScore()    // Recalculate and display final score
-window.showSubjectDetails(i) // Navigate to course detail view
+// State
+window.AppState               // Centralized state
+window.GradingUtils           // Conversion utilities
+window.GradingScaleUI         // Scale selector UI
+
+// Grade Calculator
+window.subjects               // Course array
+window.renderSubjects()       // Re-render subject list
+window.updateFinalScore()     // Recalculate final score
+window.showSubjectDetails(i)  // Navigate to course detail
 window.calculateSubjectScore(subject) // Get course average
-window.saveUserData()        // Save to Firestore
-window.loadUserData(userId)  // Load from Firestore
+
+// Data persistence
+window.saveUserData()         // Save to Firestore
+window.loadUserData(userId)   // Load from Firestore
+
+// Scale (wrappers for AppState)
+window.setGradingScale(scale) // Change scale
+window.getGradingScale()      // Get current scale
+window.onGradingScaleChange   // Callback when scale changes
 ```
-
-## UI Structure (app.html)
-
-1. **Calculator Page** (`#calculator-page`): Main view with all subjects and final score
-2. **Subject Details Page** (`#subject-details-page`): Individual course grades
-3. **Study Plan Page** (`#study-plan-page`): Future feature (currently empty)
-
-### Modals
-- Subject Popup: Add/edit courses
-- Grade Popup: Add/edit grades
 
 ## Authentication Flow
 
@@ -123,49 +196,26 @@ window.loadUserData(userId)  // Load from Firestore
 4. Session stored in localStorage (`etudlyAuth*` keys)
 5. `onAuthStateChanged` listener manages state
 
-## Development Notes
+## Adding New Features
 
-### Grading Scale System (Implemented)
+To add a new feature:
 
-The app supports multiple grading scales. All grades are stored internally in /20 scale and converted for display.
-
-**Available Scales:**
-- **French (/20)**: Default, 0-20 scale
-- **Percentage (100%)**: 0-100 scale
-- **Decimal (/10)**: 0-10 scale
-
-**Key Functions in `app.js`:**
-- `setGradingScale(scale)` - Change the current scale (20, 100, or 10)
-- `getGradingScale()` - Get current scale
-- `convertFromBase(value)` - Convert from /20 to current scale
-- `convertToBase(value)` - Convert from current scale to /20
-- `formatGrade(valueIn20)` - Format a grade for display
-- `loadGradingScalePreference()` - Load user's scale preference from Firestore
-- `saveGradingScalePreference(scale)` - Save preference to Firestore
-
-**Storage:**
-- Grades are always stored in /20 scale in Firestore
-- User's scale preference is stored in `users/{userId}.gradingScale`
-
-**UI Elements:**
-- Settings button in page header (`#grading-scale-btn`)
-- Scale selector popup (`#grading-scale-popup`)
-- Scale label updates: `#current-scale-label`, `#final-score-scale`
-
-**Conversion Formulas:**
-```javascript
-// Convert from /20 to current scale
-convertFromBase = (value / 20) * window.gradingScale
-
-// Convert from current scale to /20
-convertToBase = (value / window.gradingScale) * 20
-```
+1. Create feature folder: `src/features/my-feature/`
+2. Add feature HTML page: `my-feature.html`
+3. Include core modules in HTML:
+   ```html
+   <script src="src/core/state.js"></script>
+   <script src="src/core/grading-utils.js"></script>
+   <script src="src/shared/grading-scale-ui.js"></script>
+   ```
+4. Include grading scale button in header (copy from app.html)
+5. Include grading scale popup (copy from app.html)
+6. Access shared state via `window.AppState`
 
 ## Common Tasks
 
 ### Run Locally
 ```bash
-# Serve with any static server
 npx serve .
 # or
 python -m http.server 8000
@@ -189,6 +239,7 @@ FIREBASE_APP_ID=
 
 - Vanilla JS, no transpilation
 - Global functions exposed on `window`
+- Modular code in `src/` folder
 - CSS custom properties for theming
 - Mobile-first responsive design
-- French comments in some places (bilingual codebase)
+- Bilingual comments (French/Spanish/English)

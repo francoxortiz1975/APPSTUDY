@@ -73,6 +73,13 @@
                     </svg>
                 </button>
                 <h1 id="page-title">Plan d'Études</h1>
+                <button id="grading-scale-btn" class="grading-scale-btn" title="Changer le système de notation">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span id="current-scale-label">/20</span>
+                </button>
             </div>
             
             <!-- Page plan d'études -->
@@ -211,7 +218,37 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Popup pour changer le système de notation -->
+    <div id="grading-scale-popup" class="modal-popup">
+        <div class="popup-form grading-scale-form">
+            <h3>Système de Notation</h3>
+            <p class="popup-description">Choisissez comment afficher vos notes</p>
+
+            <div class="grading-scale-options">
+                <button type="button" class="scale-option" data-scale="20" data-max="20">
+                    <span class="scale-icon">/20</span>
+                    <span class="scale-name">France</span>
+                    <span class="scale-desc">Note sur 20 points</span>
+                </button>
+                <button type="button" class="scale-option" data-scale="100" data-max="100">
+                    <span class="scale-icon">%</span>
+                    <span class="scale-name">Pourcentage</span>
+                    <span class="scale-desc">Note sur 100%</span>
+                </button>
+                <button type="button" class="scale-option" data-scale="10" data-max="10">
+                    <span class="scale-icon">/10</span>
+                    <span class="scale-name">Décimal</span>
+                    <span class="scale-desc">Note sur 10 points</span>
+                </button>
+            </div>
+
+            <div class="popup-actions">
+                <button type="button" id="grading-scale-close">Fermer</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Configuration Firebase et Google -->
     <script src="config.js"></script>
     <script src="googleConfig.js"></script>
@@ -244,6 +281,11 @@
         });
     </script>
     
+    <!-- Core modules -->
+    <script src="src/core/state.js"></script>
+    <script src="src/core/grading-utils.js"></script>
+    <script src="src/shared/grading-scale-ui.js"></script>
+
     <!-- Scripts de l'application -->
     <script src="firestore.js"></script>
     <script src="auth-manager.js"></script>

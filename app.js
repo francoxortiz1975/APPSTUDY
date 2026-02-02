@@ -2,10 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Hacer subjects global para acceder desde las funciones de autenticación
     window.subjects = [];
 
-    // Sistema de calificación - por defecto /20 (Francia)
-    // Valores posibles: 20, 100, 10
-    window.gradingScale = 20;
-
     // Hacer todas las funciones globales para que estén disponibles desde cualquier script
     window.renderSubjects = renderSubjects;
     window.updateFinalScore = updateFinalScore;
@@ -13,6 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
     window.calculateSubjectScore = calculateSubjectScore;
     window.setGradingScale = setGradingScale;
     window.getGradingScale = getGradingScale;
+
+    // Callback when grading scale changes (called from GradingScaleUI)
+    window.onGradingScaleChange = function(scale) {
+        renderSubjects();
+        if (currentSubjectIndex !== -1 && window.subjects[currentSubjectIndex]) {
+            showSubjectDetails(window.subjects[currentSubjectIndex]);
+        }
+    };
     
     // Main page elements
     const mainPage = document.getElementById("calculator-page");
@@ -38,12 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const gradePopup = document.getElementById("grade-popup");
     const gradePopupSubmit = document.getElementById("grade-popup-submit");
     const gradePopupClose = document.getElementById("grade-popup-close");
-
-    // Grading Scale Popup Elements
-    const gradingScaleBtn = document.getElementById("grading-scale-btn");
-    const gradingScalePopup = document.getElementById("grading-scale-popup");
-    const gradingScaleClose = document.getElementById("grading-scale-close");
-    const scaleOptions = document.querySelectorAll(".scale-option");
 
     let currentSubjectIndex = -1;
     let editingSubjectIndex = -1; // Para seguir si estamos editando una materia existente
@@ -176,190 +174,51 @@ history.pushState(null, document.title, window.location.href);
         }, 300);
     });
 
-    // Open grading scale popup
-    if (gradingScaleBtn) {
-        gradingScaleBtn.addEventListener("click", () => {
-            // Marcar la opción activa actual
-            scaleOptions.forEach(opt => {
-                opt.classList.remove("active");
-                if (parseInt(opt.dataset.scale) === window.gradingScale) {
-                    opt.classList.add("active");
-                }
-            });
-            gradingScalePopup.style.display = "flex";
-            gradingScalePopup.classList.add("active");
-        });
-    }
-
-    // Close grading scale popup
-    if (gradingScaleClose) {
-        gradingScaleClose.addEventListener("click", () => {
-            gradingScalePopup.classList.remove("active");
-            setTimeout(() => {
-                gradingScalePopup.style.display = "none";
-            }, 300);
-        });
-    }
-
-    // Handle scale option selection
-    scaleOptions.forEach(option => {
-        option.addEventListener("click", () => {
-            const newScale = parseInt(option.dataset.scale);
-            setGradingScale(newScale);
-
-            // Actualizar UI del popup
-            scaleOptions.forEach(opt => opt.classList.remove("active"));
-            option.classList.add("active");
-
-            // Cerrar popup después de seleccionar
-            setTimeout(() => {
-                gradingScalePopup.classList.remove("active");
-                setTimeout(() => {
-                    gradingScalePopup.style.display = "none";
-                }, 300);
-            }, 200);
-        });
-    });
-
-    // Función para cambiar el sistema de calificación
+    // Función para cambiar el sistema de calificación (wrapper para AppState)
     function setGradingScale(scale) {
-        window.gradingScale = scale;
-
-        // Actualizar el label del botón
-        const scaleLabel = document.getElementById("current-scale-label");
-        if (scaleLabel) {
-            if (scale === 100) {
-                scaleLabel.textContent = "%";
-            } else {
-                scaleLabel.textContent = "/" + scale;
-            }
+        if (window.AppState) {
+            window.AppState.setGradingScale(scale);
         }
-
-        // Actualizar el label del score final
-        const finalScaleLabel = document.getElementById("final-score-scale");
-        if (finalScaleLabel) {
-            if (scale === 100) {
-                finalScaleLabel.textContent = "%";
-            } else {
-                finalScaleLabel.textContent = "/" + scale;
-            }
-        }
-
-        // Actualizar el label del input de nota en el popup
-        updateGradeInputLabel();
-
-        // Re-renderizar todo con la nueva escala
-        renderSubjects();
-
-        // Si estamos viendo detalles de una materia, actualizar también
-        if (currentSubjectIndex !== -1 && window.subjects[currentSubjectIndex]) {
-            showSubjectDetails(window.subjects[currentSubjectIndex]);
-        }
-
-        // Guardar preferencia en Firestore
-        if (typeof auth !== 'undefined' && auth && auth.currentUser) {
-            saveGradingScalePreference(scale);
-        }
+        // UI updates are handled by GradingScaleUI
     }
 
     // Función para obtener el sistema de calificación actual
     function getGradingScale() {
-        return window.gradingScale;
+        return window.AppState ? window.AppState.getGradingScale() : 20;
     }
 
     // Función para actualizar el label del input de nota
     function updateGradeInputLabel() {
-        const label = document.getElementById("grade-value-label");
-        const input = document.getElementById("grade-value");
-        if (label && input) {
-            if (window.gradingScale === 100) {
-                label.textContent = "Note (%)";
-            } else {
-                label.textContent = "Note (/" + window.gradingScale + "):";
-            }
-            input.max = window.gradingScale;
+        if (window.GradingScaleUI) {
+            window.GradingScaleUI.updateAllScaleLabels();
         }
     }
 
     // Función para convertir una nota de escala /20 a la escala actual
     function convertFromBase(value) {
-        return (value / 20) * window.gradingScale;
+        return window.GradingUtils ? window.GradingUtils.convertFromBase(value) : value;
     }
 
     // Función para convertir una nota de la escala actual a /20 (para almacenamiento)
     function convertToBase(value) {
-        return (value / window.gradingScale) * 20;
+        return window.GradingUtils ? window.GradingUtils.convertToBase(value) : value;
     }
 
     // Función para formatear la nota según la escala actual
     function formatGrade(valueIn20) {
-        const converted = convertFromBase(valueIn20);
-        if (window.gradingScale === 100) {
-            return converted.toFixed(1) + "%";
-        } else {
-            return converted.toFixed(2) + "/" + window.gradingScale;
-        }
-    }
-
-    // Función para guardar la preferencia de escala en Firestore
-    function saveGradingScalePreference(scale) {
-        if (typeof db === 'undefined' || !db) return;
-
-        const userId = auth.currentUser.uid;
-        const userRef = db.collection('users').doc(userId);
-
-        userRef.update({
-            gradingScale: scale
-        }).then(() => {
-            console.log("Preferencia de escala guardada:", scale);
-        }).catch((error) => {
-            console.error("Error al guardar preferencia de escala:", error);
-        });
+        return window.GradingUtils ? window.GradingUtils.formatGrade(valueIn20) : valueIn20.toFixed(2);
     }
 
     // Función para cargar la preferencia de escala desde Firestore
     function loadGradingScalePreference() {
-        if (typeof db === 'undefined' || !db) return;
-        if (typeof auth === 'undefined' || !auth || !auth.currentUser) return;
-
-        const userId = auth.currentUser.uid;
-        const userRef = db.collection('users').doc(userId);
-
-        userRef.get().then((doc) => {
-            if (doc.exists && doc.data().gradingScale) {
-                const scale = doc.data().gradingScale;
-                window.gradingScale = scale;
-
-                // Actualizar UI del botón
-                const scaleLabel = document.getElementById("current-scale-label");
-                if (scaleLabel) {
-                    if (scale === 100) {
-                        scaleLabel.textContent = "%";
-                    } else {
-                        scaleLabel.textContent = "/" + scale;
-                    }
+        if (window.AppState) {
+            window.AppState.loadFromFirestore().then(() => {
+                if (window.GradingScaleUI) {
+                    window.GradingScaleUI.updateAllScaleLabels();
                 }
-
-                // Actualizar label del score final
-                const finalScaleLabel = document.getElementById("final-score-scale");
-                if (finalScaleLabel) {
-                    if (scale === 100) {
-                        finalScaleLabel.textContent = "%";
-                    } else {
-                        finalScaleLabel.textContent = "/" + scale;
-                    }
-                }
-
-                updateGradeInputLabel();
-
-                // Re-renderizar con la escala cargada
-                if (typeof window.renderSubjects === 'function') {
-                    renderSubjects();
-                }
-            }
-        }).catch((error) => {
-            console.error("Error al cargar preferencia de escala:", error);
-        });
+                renderSubjects();
+            });
+        }
     }
 
     // Hacer loadGradingScalePreference global
@@ -546,7 +405,7 @@ history.pushState(null, document.title, window.location.href);
         const gradeValue = convertToBase(gradeValueInput);
 
         if (currentSubjectIndex !== -1 && gradeName &&
-            !isNaN(gradeValueInput) && gradeValueInput >= 0 && gradeValueInput <= window.gradingScale &&
+            !isNaN(gradeValueInput) && gradeValueInput >= 0 && gradeValueInput <= getGradingScale() &&
             !isNaN(gradePercentage) && gradePercentage > 0) {
 
             const grade = {
@@ -806,7 +665,7 @@ history.pushState(null, document.title, window.location.href);
 
                 // Convertir la nota a la escala actual
                 const displayScore = convertFromBase(subjectScore);
-                const scaleLabel = window.gradingScale === 100 ? "%" : "/" + window.gradingScale;
+                const scaleLabel = getGradingScale() === 100 ? "%" : "/" + getGradingScale();
 
                 scoreCircle.innerHTML = `
                     <span style="font-size: 1.2rem; font-weight: bold; color: ${statusColor};">${displayScore.toFixed(1)}</span>
@@ -906,7 +765,7 @@ function showSubjectDetails(subject) {
 
         // Convertir a la escala actual
         const displayScore = convertFromBase(subjectScore);
-        const scaleLabel = window.gradingScale === 100 ? "%" : " / " + window.gradingScale;
+        const scaleLabel = getGradingScale() === 100 ? "%" : " / " + getGradingScale();
         document.getElementById("subject-current-score").textContent = `${displayScore.toFixed(2)}${scaleLabel}`;
    
         // Render grades list
