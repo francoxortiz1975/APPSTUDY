@@ -44,8 +44,9 @@ Maximum 20 mots par action. En français. Pas d'introduction ni de conclusion.`;
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: {
-                        maxOutputTokens: 200,
-                        temperature: 0.7
+                        maxOutputTokens: 1024,
+                        temperature: 0.7,
+                        thinkingConfig: { thinkingBudget: 0 }
                     }
                 })
             }
@@ -58,6 +59,7 @@ Maximum 20 mots par action. En français. Pas d'introduction ni de conclusion.`;
         }
 
         const data = await response.json();
+        console.log("Gemini raw response:", JSON.stringify(data).substring(0, 1000));
         const tip = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 
         return res.status(200).json({ tip });
