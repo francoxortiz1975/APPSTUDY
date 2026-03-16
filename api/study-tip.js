@@ -3,9 +3,9 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: "Method not allowed" });
     }
 
-    const apiKey = process.env.AI_GATEWAY_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        return res.status(500).json({ error: "AI_GATEWAY_KEY not configured" });
+        return res.status(500).json({ error: "GEMINI_API_KEY not configured" });
     }
 
     try {
@@ -36,33 +36,29 @@ Donne exactement 3 actions concrètes et spécifiques pour monter la moyenne. Fo
 3. [action]
 Maximum 20 mots par action. En français. Pas d'introduction ni de conclusion.`;
 
-        const response = await fetch("https://ai-gateway.vercel.sh/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: "google/gemini-2.0-flash",
-                messages: [{ role: "user", content: prompt }],
-                max_tokens: 200,
-                temperature: 0.7
-            })
-        });
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        maxOutputTokens: 200,
+                        temperature: 0.7
+                    }
+                })
+            }
+        );
 
         if (!response.ok) {
             const errText = await response.text();
-            console.error("AI Gateway error:", response.status, errText);
-            return res.status(502).json({ error: "AI service unavailable", detail: errText });
+            console.error("Gemini API error:", response.status, errText);
+            return res.status(502).json({ error: "AI service unavailable" });
         }
 
         const data = await response.json();
-        console.log("AI Gateway response:", JSON.stringify(data).substring(0, 500));
-        const tip = data?.choices?.[0]?.message?.content?.trim() || "";
-
-        if (!tip) {
-            return res.status(200).json({ tip: "", debug: "empty response from model" });
-        }
+        const tip = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 
         return res.status(200).json({ tip });
     } catch (err) {
