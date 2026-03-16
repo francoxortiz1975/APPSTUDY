@@ -222,10 +222,10 @@ body {
   margin: 20px 0;
 }
 
-/* Score Dashboard: 3 bloques verticales */
+/* Score Dashboard: 3 bloques horizontales */
 .score-dashboard {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
   margin: 20px 0;
 }
@@ -237,6 +237,10 @@ body {
   padding: 16px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 110px;
 }
 
 .score-label {
@@ -359,6 +363,12 @@ body {
 .ai-tip-text.loading {
   opacity: 0.6;
   font-style: italic;
+}
+
+@media (max-width: 700px) {
+  .score-dashboard {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Modal popup styles */
