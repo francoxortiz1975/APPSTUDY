@@ -77,7 +77,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!window.subjects || window.subjects.length === 0) return null;
         return window.subjects.map(s => {
             const avg = s.grades.length > 0 ? calculateSubjectScore(s) : null;
-            return { name: s.name, average: avg !== null ? avg.toFixed(2) : "pas de notes" };
+            const grades = s.grades.map(g => ({
+                name: g.name,
+                score: g.value.toFixed(1),
+                weight: g.percentage + "%"
+            }));
+            return {
+                name: s.name,
+                weight: s.weight,
+                average: avg !== null ? avg.toFixed(2) : "pas de notes",
+                grades: grades
+            };
         });
     }
 
@@ -86,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (now - lastTipRequestTime < TIP_COOLDOWN_MS) return;
 
         const summary = buildSubjectSummary();
-        if (!summary) return;
+        if (!summary || summary.every(s => s.grades.length === 0)) return;
 
         // Check sessionStorage cache
         const cacheKey = JSON.stringify({ s: summary, t: targetGradeBase.toFixed(1) });
@@ -95,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const c = JSON.parse(cached);
                 if (c.key === cacheKey) {
-                    if (aiTipText) aiTipText.textContent = c.tip;
+                    if (aiTipText) aiTipText.innerHTML = c.tip;
                     return;
                 }
             } catch(e) { /* ignore */ }
@@ -103,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         lastTipRequestTime = now;
         if (aiTipText) {
-            aiTipText.textContent = "Chargement du conseil...";
+            aiTipText.textContent = "Chargement...";
             aiTipText.classList.add("loading");
         }
 
@@ -120,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             const tip = data.tip || getFallbackTip(currentScoreBase);
             if (aiTipText) {
-                aiTipText.textContent = tip;
+                aiTipText.innerHTML = tip;
                 aiTipText.classList.remove("loading");
             }
             sessionStorage.setItem("etudlyAITip", JSON.stringify({ key: cacheKey, tip }));
@@ -128,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(() => {
             const tip = getFallbackTip(currentScoreBase);
             if (aiTipText) {
-                aiTipText.textContent = tip;
+                aiTipText.innerHTML = tip;
                 aiTipText.classList.remove("loading");
             }
         });
@@ -138,7 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!window.subjects || window.subjects.length === 0) {
             return "Ajoute des cours et des notes pour recevoir des conseils personnalisés.";
         }
-        // Find weakest subject
         let weakest = null, weakestScore = Infinity;
         window.subjects.forEach(s => {
             if (s.grades.length > 0) {

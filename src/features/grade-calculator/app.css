@@ -222,12 +222,13 @@ body {
   margin: 20px 0;
 }
 
-/* Score Dashboard: 3 bloques horizontales */
+/* Score Dashboard: 2 bloques horizontales 65/35 */
 .score-dashboard {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 65fr 35fr;
   gap: 12px;
   margin: 20px 0;
+  align-items: stretch;
 }
 
 .score-panel {
@@ -240,7 +241,6 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 110px;
 }
 
 .score-label {
@@ -298,20 +298,16 @@ body {
   line-height: 1.1;
 }
 
-/* Bloque 3: Insight panel */
-.insight-panel {
-  display: flex;
-  flex-direction: column;
+/* Right panel: target + proximity + tip */
+.target-panel {
   gap: 10px;
-  align-items: center;
 }
 
 .target-proximity-msg {
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 700;
   border-radius: 8px;
-  padding: 8px 16px;
-  width: 100%;
+  padding: 6px 12px;
   transition: background 0.3s, color 0.3s;
 }
 
@@ -365,7 +361,7 @@ body {
   font-style: italic;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 600px) {
   .score-dashboard {
     grid-template-columns: 1fr;
   }

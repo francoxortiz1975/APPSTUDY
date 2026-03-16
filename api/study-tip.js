@@ -15,14 +15,26 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: "Invalid subjects data" });
         }
 
-        const subjectList = subjects
-            .map(s => `${s.name}: ${s.average}/20`)
-            .join(", ");
+        const subjectDetails = subjects.map(s => {
+            let detail = `${s.name} (coef ${s.weight}, moyenne: ${s.average}/20)`;
+            if (s.grades && s.grades.length > 0) {
+                const gradeList = s.grades.map(g => `${g.name}: ${g.score}/20 (${g.weight})`).join(", ");
+                detail += ` — Notes: ${gradeList}`;
+            }
+            return detail;
+        }).join("\n");
 
-        const prompt = `Tu es un conseiller académique bienveillant. Voici les notes d'un étudiant (sur 20):
-${subjectList}
+        const prompt = `Tu es un conseiller académique. Voici le détail des cours et notes d'un étudiant (sur 20):
+${subjectDetails}
+
 Moyenne actuelle: ${currentAverage}/20. Objectif: ${target}/20.
-Donne UN seul conseil court (maximum 25 mots) en français, motivant et spécifique à ses matières. Pas de formule de politesse. Juste le conseil.`;
+
+Analyse les évaluations (quizzes, projets, examens, TDs...) et identifie celles qui ont le plus de poids ou les plus faciles à améliorer.
+Donne exactement 3 actions concrètes et spécifiques pour monter la moyenne. Format:
+1. [action]
+2. [action]
+3. [action]
+Maximum 20 mots par action. En français. Pas d'introduction ni de conclusion.`;
 
         const response = await fetch("https://ai-gateway.vercel.sh/v1/chat/completions", {
             method: "POST",
@@ -33,7 +45,7 @@ Donne UN seul conseil court (maximum 25 mots) en français, motivant et spécifi
             body: JSON.stringify({
                 model: "google/gemini-2.0-flash",
                 messages: [{ role: "user", content: prompt }],
-                max_tokens: 80,
+                max_tokens: 200,
                 temperature: 0.7
             })
         });
