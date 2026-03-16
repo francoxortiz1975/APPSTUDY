@@ -351,9 +351,10 @@ body {
 }
 
 .ai-tip-text {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-secondary, #495057);
-  line-height: 1.4;
+  line-height: 1.5;
+  white-space: pre-line;
 }
 
 .ai-tip-text.loading {
