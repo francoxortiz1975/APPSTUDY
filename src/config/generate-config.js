@@ -33,8 +33,8 @@ window.getGoogleClientId = function() {
 };
 `;
 
-// Escribir los archivos
-fs.writeFileSync('./config.js', firebaseConfigContent);
-fs.writeFileSync('./googleConfig.js', googleConfigContent);
+// Escribir los archivos en src/config/ donde los HTML los referencian
+fs.writeFileSync('./src/config/config.js', firebaseConfigContent);
+fs.writeFileSync('./src/config/googleConfig.js', googleConfigContent);
 
 console.log('Archivos de configuración generados correctamente');

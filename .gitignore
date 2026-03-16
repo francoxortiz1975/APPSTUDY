@@ -1,4 +1,6 @@
 .env
 config.js
 googleConfig.js
+src/config/config.js
+src/config/googleConfig.js
 CLAUDE.md
