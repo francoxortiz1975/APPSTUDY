@@ -162,24 +162,32 @@
             
             <!-- Page calculatrice de notes -->
             <div id="calculator-page" class="content-page" style="display: block;">
-                <!-- Note moyenne + Objectif -->
-                <div class="score-summary-grid">
-                    <!-- Panneau gauche: Note actuelle -->
+                <!-- Score Dashboard: 3 bloques -->
+                <div class="score-dashboard">
+                    <!-- Bloque 1: Nota actual + barra progreso -->
                     <div class="score-panel current-score-panel">
                         <p class="score-label">Note moyenne</p>
                         <h2 class="score-value"><span id="final-score">0</span><span id="final-score-scale">/20</span></h2>
                         <div id="progress-bar"></div>
                     </div>
 
-                    <!-- Panneau droit: Note Objectif -->
+                    <!-- Bloque 2: Nota Objetivo -->
                     <div class="score-panel target-score-panel">
-                        <p class="score-label">Note Objectif</p>
+                        <p class="score-label">Objectif</p>
                         <div class="target-input-row">
                             <button class="target-btn" id="target-decrease">−</button>
                             <span class="target-value-display"><span id="target-score-value">12</span><span id="target-score-scale">/20</span></span>
                             <button class="target-btn" id="target-increase">+</button>
                         </div>
+                    </div>
+
+                    <!-- Bloque 3: Distancia al objetivo + Tip IA -->
+                    <div class="score-panel insight-panel">
                         <div id="target-proximity-msg" class="target-proximity-msg"></div>
+                        <div id="ai-tip" class="ai-tip">
+                            <span class="ai-tip-icon">💡</span>
+                            <span id="ai-tip-text" class="ai-tip-text">Ajoute des notes pour recevoir des conseils</span>
+                        </div>
                     </div>
                 </div>
 

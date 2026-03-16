@@ -222,17 +222,11 @@ body {
   margin: 20px 0;
 }
 
-/* Legacy .score-summary kept for safety */
-.score-summary {
-  text-align: center;
-  margin: 20px 0;
-}
-
-/* Two-column score grid */
-.score-summary-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+/* Score Dashboard: 3 bloques verticales */
+.score-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin: 20px 0;
 }
 
@@ -240,7 +234,7 @@ body {
   background: var(--card-bg, #fff);
   border: 1px solid var(--border-color, #e9ecef);
   border-radius: 12px;
-  padding: 18px 16px 14px;
+  padding: 16px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
@@ -267,8 +261,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 12px;
 }
 
 .target-btn {
@@ -294,20 +287,27 @@ body {
 }
 
 .target-value-display {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: var(--text-primary, #212529);
   min-width: 70px;
   line-height: 1.1;
 }
 
-/* Proximity message */
+/* Bloque 3: Insight panel */
+.insight-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
 .target-proximity-msg {
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   border-radius: 8px;
-  padding: 5px 10px;
-  min-height: 28px;
+  padding: 8px 16px;
+  width: 100%;
   transition: background 0.3s, color 0.3s;
 }
 
@@ -331,10 +331,34 @@ body {
   color: #721c24;
 }
 
-@media (max-width: 500px) {
-  .score-summary-grid {
-    grid-template-columns: 1fr;
-  }
+/* AI Tip */
+.ai-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--card-bg, #f0f4ff);
+  border: 1px solid var(--border-color, #d0d7f7);
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: 100%;
+  text-align: left;
+}
+
+.ai-tip-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ai-tip-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #495057);
+  line-height: 1.4;
+}
+
+.ai-tip-text.loading {
+  opacity: 0.6;
+  font-style: italic;
 }
 
 /* Modal popup styles */

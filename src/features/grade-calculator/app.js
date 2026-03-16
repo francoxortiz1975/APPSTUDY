@@ -31,8 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const targetProximityMsg = document.getElementById("target-proximity-msg");
     const targetDecreaseBtn = document.getElementById("target-decrease");
     const targetIncreaseBtn = document.getElementById("target-increase");
+    const aiTipText = document.getElementById("ai-tip-text");
 
     let targetGradeBase = parseFloat(localStorage.getItem("etudlyTargetGrade") || "12");
+    let lastTipRequestTime = 0;
+    const TIP_COOLDOWN_MS = 30000; // 30s entre llamadas a Gemini
 
     function saveTargetGrade() {
         localStorage.setItem("etudlyTargetGrade", targetGradeBase);
@@ -50,27 +53,106 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateProximityMessage(currentScoreBase) {
         if (!targetProximityMsg) return;
-        const gap = targetGradeBase - currentScoreBase; // in /20
-        const scale = getGradingScale();
-        const displayGap = scale === 100 ? ((gap / 20) * 100).toFixed(1)
-                         : scale === 10  ? ((gap / 20) * 10).toFixed(1)
-                         : gap.toFixed(2);
-        const scaleLabel = scale === 100 ? "%" : "/" + scale;
+        const gap = targetGradeBase - currentScoreBase;
+        const displayGap = gap.toFixed(2).replace('.', ',');
 
         targetProximityMsg.className = "target-proximity-msg";
         if (gap <= 0) {
-            targetProximityMsg.textContent = "¡Objetivo alcanzado! 🎉";
+            targetProximityMsg.textContent = "Objectif atteint ! 🎉";
             targetProximityMsg.classList.add("achieved");
         } else if (gap <= 1) {
-            targetProximityMsg.textContent = `¡Casi! Solo te falta ${displayGap}${scaleLabel} 🔥`;
+            targetProximityMsg.textContent = `Presque ! Il ne te manque que ${displayGap} points 🔥`;
             targetProximityMsg.classList.add("close");
         } else if (gap <= 3) {
-            targetProximityMsg.textContent = `Vas bien, te faltan ${displayGap}${scaleLabel} 💪`;
+            targetProximityMsg.textContent = `Il te manque ${displayGap} points, continue ! 💪`;
             targetProximityMsg.classList.add("medium");
         } else {
-            targetProximityMsg.textContent = `Te faltan ${displayGap}${scaleLabel} para tu objetivo`;
+            targetProximityMsg.textContent = `Il te manque ${displayGap} points pour ton objectif`;
             targetProximityMsg.classList.add("far");
         }
+    }
+
+    // --- Gemini Flash AI Tip ---
+    function buildSubjectSummary() {
+        if (!window.subjects || window.subjects.length === 0) return null;
+        return window.subjects.map(s => {
+            const avg = s.grades.length > 0 ? calculateSubjectScore(s) : null;
+            return { name: s.name, average: avg !== null ? avg.toFixed(2) : "pas de notes" };
+        });
+    }
+
+    function fetchAITip(currentScoreBase) {
+        const now = Date.now();
+        if (now - lastTipRequestTime < TIP_COOLDOWN_MS) return;
+
+        const summary = buildSubjectSummary();
+        if (!summary) return;
+
+        // Check sessionStorage cache
+        const cacheKey = JSON.stringify({ s: summary, t: targetGradeBase.toFixed(1) });
+        const cached = sessionStorage.getItem("etudlyAITip");
+        if (cached) {
+            try {
+                const c = JSON.parse(cached);
+                if (c.key === cacheKey) {
+                    if (aiTipText) aiTipText.textContent = c.tip;
+                    return;
+                }
+            } catch(e) { /* ignore */ }
+        }
+
+        lastTipRequestTime = now;
+        if (aiTipText) {
+            aiTipText.textContent = "Chargement du conseil...";
+            aiTipText.classList.add("loading");
+        }
+
+        fetch("/api/study-tip", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                subjects: summary,
+                currentAverage: currentScoreBase.toFixed(2),
+                target: targetGradeBase.toFixed(2)
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            const tip = data.tip || getFallbackTip(currentScoreBase);
+            if (aiTipText) {
+                aiTipText.textContent = tip;
+                aiTipText.classList.remove("loading");
+            }
+            sessionStorage.setItem("etudlyAITip", JSON.stringify({ key: cacheKey, tip }));
+        })
+        .catch(() => {
+            const tip = getFallbackTip(currentScoreBase);
+            if (aiTipText) {
+                aiTipText.textContent = tip;
+                aiTipText.classList.remove("loading");
+            }
+        });
+    }
+
+    function getFallbackTip(currentScoreBase) {
+        if (!window.subjects || window.subjects.length === 0) {
+            return "Ajoute des cours et des notes pour recevoir des conseils personnalisés.";
+        }
+        // Find weakest subject
+        let weakest = null, weakestScore = Infinity;
+        window.subjects.forEach(s => {
+            if (s.grades.length > 0) {
+                const avg = calculateSubjectScore(s);
+                if (avg < weakestScore) { weakestScore = avg; weakest = s.name; }
+            }
+        });
+        if (weakest && weakestScore < targetGradeBase) {
+            return `Concentre-toi sur ${weakest} — c'est là que tu peux le plus progresser 📚`;
+        }
+        if (currentScoreBase >= targetGradeBase) {
+            return "Excellent travail ! Continue comme ça pour maintenir ta moyenne 🌟";
+        }
+        return "Révise régulièrement et concentre-toi sur tes points faibles 📖";
     }
 
     if (targetDecreaseBtn) {
@@ -1025,6 +1107,9 @@ function showSubjectDetails(subject) {
 
         // Update target proximity indicator
         updateProximityMessage(score);
+
+        // Fetch AI tip (respects cooldown)
+        fetchAITip(score);
     }
 
     // Inicializar la aplicación - Verificar si el usuario ya está autenticado al cargar
