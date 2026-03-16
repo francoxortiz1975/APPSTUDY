@@ -18,7 +18,7 @@
         <div class="login-container">
             <!-- Écran principal de connexion -->
             <div id="login-section">
-                <img src="1.png" alt="Logo Etudly" class="login-logo">
+                <img src="../../../assets/1.png" alt="Logo Etudly" class="login-logo">
                 <h2>Bienvenue sur Etudly</h2>
                 <p>Connectez-vous pour accéder à votre espace d'étude personnel</p>
                 
@@ -48,7 +48,7 @@
                     Retour
                 </div>
                 
-                <img src="1.png" alt="Logo Etudly" class="login-logo">
+                <img src="../../../assets/1.png" alt="Logo Etudly" class="login-logo">
                 <h2>Connexion</h2>
                 
                 <form id="login-with-email" class="auth-form">
@@ -72,7 +72,7 @@
                     Retour
                 </div>
                 
-                <img src="1.png" alt="Logo Etudly" class="login-logo">
+                <img src="../../../assets/1.png" alt="Logo Etudly" class="login-logo">
                 <h2>Créer un compte</h2>
                 
                 <form id="register-button" class="auth-form">
@@ -96,7 +96,7 @@
         <!-- Barre latérale -->
         <div id="sidebar" class="sidebar">
             <div class="sidebar-header">
-                <img src="4.png" alt="Logo Etudly">
+                <img src="../../../assets/4.png" alt="Logo Etudly">
                 <h2>Etudly</h2>
             </div>
             
@@ -112,7 +112,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="study-plan.html" data-page="study-plan-page">
+                    <a href="../study-plan/study-plan.html" data-page="study-plan-page">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
@@ -162,10 +162,25 @@
             
             <!-- Page calculatrice de notes -->
             <div id="calculator-page" class="content-page" style="display: block;">
-                <!-- Note moyenne -->
-                <div class="score-summary">
-                    <h3>Note moyenne: <span id="final-score">0</span><span id="final-score-scale">/20</span></h3>
-                    <div id="progress-bar"></div>
+                <!-- Note moyenne + Objectif -->
+                <div class="score-summary-grid">
+                    <!-- Panneau gauche: Note actuelle -->
+                    <div class="score-panel current-score-panel">
+                        <p class="score-label">Note moyenne</p>
+                        <h2 class="score-value"><span id="final-score">0</span><span id="final-score-scale">/20</span></h2>
+                        <div id="progress-bar"></div>
+                    </div>
+
+                    <!-- Panneau droit: Note Objectif -->
+                    <div class="score-panel target-score-panel">
+                        <p class="score-label">Note Objectif</p>
+                        <div class="target-input-row">
+                            <button class="target-btn" id="target-decrease">−</button>
+                            <span class="target-value-display"><span id="target-score-value">12</span><span id="target-score-scale">/20</span></span>
+                            <button class="target-btn" id="target-increase">+</button>
+                        </div>
+                        <div id="target-proximity-msg" class="target-proximity-msg"></div>
+                    </div>
                 </div>
 
                 <!-- Bouton pour ajouter matière -->
@@ -340,8 +355,8 @@
     </div>
 
     <!-- Configuration Firebase et Google -->
-    <script src="config.js"></script>
-    <script src="googleConfig.js"></script><!-- Firebase SDK -->
+    <script src="../../config/config.js"></script>
+    <script src="../../config/googleConfig.js"></script><!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -373,14 +388,14 @@
       </script>
     
     <!-- Core modules -->
-    <script src="src/core/state.js"></script>
-    <script src="src/core/grading-utils.js"></script>
-    <script src="src/shared/grading-scale-ui.js"></script>
+    <script src="../../core/state.js"></script>
+    <script src="../../core/grading-utils.js"></script>
+    <script src="../../shared/grading-scale-ui.js"></script>
 
     <!-- Scripts de l'application -->
-    <script src="firestore.js"></script>
-    <script src="auth-manager.js"></script>
-    <script src="auth.js"></script>
+    <script src="../../database/firestore.js"></script>
+    <script src="../../auth/auth-manager.js"></script>
+    <script src="../../auth/auth.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

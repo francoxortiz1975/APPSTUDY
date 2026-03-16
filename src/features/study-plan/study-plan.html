@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Etudly - Plan d'Études</title>
-    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="../grade-calculator/app.css">
     
     <!-- Meta para Google Sign-In -->
     <meta name="google-signin-client_id" content="157181619799-7bh6g4fkc1ft81m2tr09dec60cn2sktf.apps.googleusercontent.com">
@@ -18,13 +18,13 @@
         <!-- Barre latérale -->
         <div id="sidebar" class="sidebar">
             <div class="sidebar-header">
-                <img src="4.png" alt="Logo Etudly">
+                <img src="../../../assets/4.png" alt="Logo Etudly">
                 <h2>Etudly</h2>
             </div>
             
             <ul class="sidebar-menu">
                 <li>
-                    <a href="app.html" data-page="calculator-page">
+                    <a href="../grade-calculator/app.html" data-page="calculator-page">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
                             <line x1="12" y1="8" x2="12" y2="16"></line>
@@ -250,8 +250,8 @@
     </div>
 
     <!-- Configuration Firebase et Google -->
-    <script src="config.js"></script>
-    <script src="googleConfig.js"></script>
+    <script src="../../config/config.js"></script>
+    <script src="../../config/googleConfig.js"></script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -282,14 +282,14 @@
     </script>
     
     <!-- Core modules -->
-    <script src="src/core/state.js"></script>
-    <script src="src/core/grading-utils.js"></script>
-    <script src="src/shared/grading-scale-ui.js"></script>
+    <script src="../../core/state.js"></script>
+    <script src="../../core/grading-utils.js"></script>
+    <script src="../../shared/grading-scale-ui.js"></script>
 
     <!-- Scripts de l'application -->
-    <script src="firestore.js"></script>
-    <script src="auth-manager.js"></script>
-    <script src="auth.js"></script>
-    <script src="study-plan.js"></script>
+    <script src="../../database/firestore.js"></script>
+    <script src="../../auth/auth-manager.js"></script>
+    <script src="../../auth/auth.js"></script>
+    <script src="../../study-plan.js"></script>
 </body>
 </html>

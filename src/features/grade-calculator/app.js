@@ -24,6 +24,83 @@ document.addEventListener("DOMContentLoaded", () => {
     const subjectList = document.getElementById("subject-list");
     const finalScore = document.getElementById("final-score");
     const progressBar = document.getElementById("progress-bar");
+
+    // Target grade elements & state (stored in /20 internally)
+    const targetValueEl = document.getElementById("target-score-value");
+    const targetScaleEl = document.getElementById("target-score-scale");
+    const targetProximityMsg = document.getElementById("target-proximity-msg");
+    const targetDecreaseBtn = document.getElementById("target-decrease");
+    const targetIncreaseBtn = document.getElementById("target-increase");
+
+    let targetGradeBase = parseFloat(localStorage.getItem("etudlyTargetGrade") || "12");
+
+    function saveTargetGrade() {
+        localStorage.setItem("etudlyTargetGrade", targetGradeBase);
+    }
+
+    function updateTargetDisplay() {
+        const scale = getGradingScale();
+        const scaleLabel = scale === 100 ? "%" : "/" + scale;
+        const displayTarget = scale === 100 ? (targetGradeBase / 20) * 100
+                            : scale === 10  ? (targetGradeBase / 20) * 10
+                            : targetGradeBase;
+        if (targetValueEl) targetValueEl.textContent = parseFloat(displayTarget.toFixed(2));
+        if (targetScaleEl) targetScaleEl.textContent = scaleLabel;
+    }
+
+    function updateProximityMessage(currentScoreBase) {
+        if (!targetProximityMsg) return;
+        const gap = targetGradeBase - currentScoreBase; // in /20
+        const scale = getGradingScale();
+        const displayGap = scale === 100 ? ((gap / 20) * 100).toFixed(1)
+                         : scale === 10  ? ((gap / 20) * 10).toFixed(1)
+                         : gap.toFixed(2);
+        const scaleLabel = scale === 100 ? "%" : "/" + scale;
+
+        targetProximityMsg.className = "target-proximity-msg";
+        if (gap <= 0) {
+            targetProximityMsg.textContent = "¡Objetivo alcanzado! 🎉";
+            targetProximityMsg.classList.add("achieved");
+        } else if (gap <= 1) {
+            targetProximityMsg.textContent = `¡Casi! Solo te falta ${displayGap}${scaleLabel} 🔥`;
+            targetProximityMsg.classList.add("close");
+        } else if (gap <= 3) {
+            targetProximityMsg.textContent = `Vas bien, te faltan ${displayGap}${scaleLabel} 💪`;
+            targetProximityMsg.classList.add("medium");
+        } else {
+            targetProximityMsg.textContent = `Te faltan ${displayGap}${scaleLabel} para tu objetivo`;
+            targetProximityMsg.classList.add("far");
+        }
+    }
+
+    if (targetDecreaseBtn) {
+        targetDecreaseBtn.addEventListener("click", () => {
+            const step = getGradingScale() === 100 ? 5 : 0.5;
+            const minBase = 0;
+            targetGradeBase = Math.max(minBase, targetGradeBase - step);
+            saveTargetGrade();
+            updateTargetDisplay();
+            updateFinalScore();
+        });
+    }
+
+    if (targetIncreaseBtn) {
+        targetIncreaseBtn.addEventListener("click", () => {
+            const step = getGradingScale() === 100 ? 5 : 0.5;
+            const maxBase = 20;
+            targetGradeBase = Math.min(maxBase, targetGradeBase + step);
+            saveTargetGrade();
+            updateTargetDisplay();
+            updateFinalScore();
+        });
+    }
+
+    // Update target display when scale changes
+    const _origOnScaleChange = window.onGradingScaleChange;
+    window.onGradingScaleChange = function(scale) {
+        updateTargetDisplay();
+        if (typeof _origOnScaleChange === 'function') _origOnScaleChange(scale);
+    };
     
     // Subject details page elements
     const subjectDetailsPage = document.getElementById("subject-details-page");
@@ -945,6 +1022,9 @@ function showSubjectDetails(subject) {
         else if (score >= 12) progressBarInner.style.backgroundColor = "#17a2b8"; // Cyan
         else if (score >= 10) progressBarInner.style.backgroundColor = "#ffc107"; // Yellow
         else progressBarInner.style.backgroundColor = "#dc3545"; // Red
+
+        // Update target proximity indicator
+        updateProximityMessage(score);
     }
 
     // Inicializar la aplicación - Verificar si el usuario ya está autenticado al cargar
@@ -975,4 +1055,8 @@ function showSubjectDetails(subject) {
 
     // Llamar a la función de inicialización
     initializeApp();
+
+    // Initialize target grade display
+    updateTargetDisplay();
+    updateProximityMessage(0);
 });
