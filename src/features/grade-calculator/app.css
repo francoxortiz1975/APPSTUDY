@@ -301,6 +301,7 @@ body {
 /* Right panel: target + proximity + tip */
 .target-panel {
   gap: 10px;
+  overflow: visible;
 }
 
 .target-proximity-msg {
@@ -355,6 +356,8 @@ body {
   color: var(--text-secondary, #495057);
   line-height: 1.5;
   white-space: pre-line;
+  word-break: break-word;
+  flex: 1;
 }
 
 .ai-tip-text.loading {
