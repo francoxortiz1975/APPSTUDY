@@ -52,12 +52,17 @@ Maximum 20 mots par action. En français. Pas d'introduction ni de conclusion.`;
 
         if (!response.ok) {
             const errText = await response.text();
-            console.error("AI Gateway error:", errText);
-            return res.status(502).json({ error: "AI service unavailable" });
+            console.error("AI Gateway error:", response.status, errText);
+            return res.status(502).json({ error: "AI service unavailable", detail: errText });
         }
 
         const data = await response.json();
+        console.log("AI Gateway response:", JSON.stringify(data).substring(0, 500));
         const tip = data?.choices?.[0]?.message?.content?.trim() || "";
+
+        if (!tip) {
+            return res.status(200).json({ tip: "", debug: "empty response from model" });
+        }
 
         return res.status(200).json({ tip });
     } catch (err) {

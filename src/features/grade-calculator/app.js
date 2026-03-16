@@ -126,8 +126,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 target: targetGradeBase.toFixed(2)
             })
         })
-        .then(r => r.json())
+        .then(r => {
+            if (!r.ok) throw new Error(`API returned ${r.status}`);
+            return r.json();
+        })
         .then(data => {
+            console.log("AI tip response:", data);
             const tip = data.tip || getFallbackTip(currentScoreBase);
             if (aiTipText) {
                 aiTipText.innerHTML = tip;
@@ -135,7 +139,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             sessionStorage.setItem("etudlyAITip", JSON.stringify({ key: cacheKey, tip }));
         })
-        .catch(() => {
+        .catch((err) => {
+            console.error("AI tip fetch error:", err);
             const tip = getFallbackTip(currentScoreBase);
             if (aiTipText) {
                 aiTipText.innerHTML = tip;
