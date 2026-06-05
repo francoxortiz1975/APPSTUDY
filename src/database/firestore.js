@@ -1,5 +1,21 @@
 // firestore.js - Gère les opérations avec la base de données Firestore
 
+const GUEST_SUBJECTS_KEY = 'etudlyGuestSubjects';
+
+function saveGuestData() {
+    localStorage.setItem(GUEST_SUBJECTS_KEY, JSON.stringify(window.subjects || []));
+}
+
+function loadGuestData() {
+    try {
+        return JSON.parse(localStorage.getItem(GUEST_SUBJECTS_KEY) || '[]');
+    } catch(e) { return []; }
+}
+
+function clearGuestData() {
+    localStorage.removeItem(GUEST_SUBJECTS_KEY);
+}
+
 // Función mejorada para cargar datos de usuario
 // Asegurarse de que auth está definido y accesible
 function loadUserData(userId) {
@@ -29,8 +45,9 @@ function loadUserData(userId) {
             // Cargar las materias del usuario
             const userData = doc.data();
             if (userData.subjects && Array.isArray(userData.subjects)) {
-                // Actualizar el array global 'subjects' con los datos de Firestore
+                // Firestore wins over any local guest data
                 window.subjects = userData.subjects;
+                clearGuestData();
                 
                 // Asegurarse de que window.renderSubjects existe antes de llamarla
                 if (typeof window.renderSubjects === 'function') {
@@ -70,22 +87,24 @@ function loadUserData(userId) {
                 return [];
             }
         } else {
-            // El usuario es nuevo, crear un documento
+            // New user: migrate guest data if available, otherwise start empty
             console.log("Nuevo usuario, creando documento...");
+            const guestSubjects = loadGuestData();
             return userRef.set({
                 displayName: auth.currentUser.displayName || "Usuario",
                 email: auth.currentUser.email || "",
                 photoURL: auth.currentUser.photoURL || "",
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                subjects: [] // Inicialmente sin materias
+                subjects: guestSubjects
             })
             .then(() => {
                 console.log("Documento de usuario creado con éxito");
-                window.subjects = []; // Inicializar subjects como array vacío
+                window.subjects = guestSubjects;
+                clearGuestData();
                 if (typeof window.renderSubjects === 'function') {
                     window.renderSubjects();
                 }
-                return [];
+                return guestSubjects;
             })
             .catch((error) => {
                 console.error("Error al crear el documento de usuario:", error);
@@ -100,15 +119,10 @@ function loadUserData(userId) {
 
 // Fonction pour sauvegarder les données de l'utilisateur
 function saveUserData() {
-    // Verificar que auth existe
-    if (typeof auth === 'undefined' || !auth) {
-        console.error("saveUserData: El objeto auth no está definido");
-        return Promise.reject("Auth object not defined");
-    }
-    
-    if (!auth.currentUser) {
-        console.log("Aucun utilisateur connecté pour sauvegarder les données");
-        return Promise.reject("No user logged in");
+    // Guest mode: save to localStorage
+    if (typeof auth === 'undefined' || !auth || !auth.currentUser) {
+        saveGuestData();
+        return Promise.resolve(true);
     }
     
     const userId = auth.currentUser.uid;

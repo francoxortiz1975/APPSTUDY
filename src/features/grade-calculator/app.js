@@ -438,10 +438,7 @@ history.pushState(null, document.title, window.location.href);
             
             renderSubjects();
             
-            // Guardar en Firebase
-            if (auth && auth.currentUser) {
-                saveUserData();
-            }
+            saveUserData();
             
             // Cerrar popup con animación
             subjectPopup.classList.remove("active");
@@ -495,11 +492,7 @@ history.pushState(null, document.title, window.location.href);
             }
             
             showSubjectDetails(window.subjects[currentSubjectIndex]);
-            
-            // Nuevo: Guardar en Firebase
-            if (auth && auth.currentUser) {
-                saveUserData();
-            }
+            saveUserData();
             
             // Close popup with animation
             gradePopup.classList.remove("active");
@@ -777,11 +770,7 @@ history.pushState(null, document.title, window.location.href);
                         window.subjects.splice(index, 1);
                         renderSubjects();
                         updateFinalScore();
-                        
-                        // Guardar en Firebase
-                        if (auth && auth.currentUser) {
-                            saveUserData();
-                        }
+                        saveUserData();
                     }
                 });
                 
@@ -810,11 +799,7 @@ history.pushState(null, document.title, window.location.href);
 
         // Update final score
         updateFinalScore();
-        
-        // Guardar datos en Firebase después de cada cambio
-        if (auth && auth.currentUser) {
-            saveUserData();
-        }
+        saveUserData();
     }
 
     // Show subject details when clicked - MODIFICADO para Firebase
@@ -920,11 +905,7 @@ function showSubjectDetails(subject) {
                         subject.grades.splice(index, 1);
                         showSubjectDetails(subject);
                         updateFinalScore();
-                        
-                        // Nuevo: Guardar en Firebase
-                        if (auth && auth.currentUser) {
-                            saveUserData();
-                        }
+                        saveUserData();
                     }
                 });
                 
@@ -940,11 +921,7 @@ function showSubjectDetails(subject) {
                 subjectGradesList.appendChild(gradeDiv);
             });
         }
-        
-        // Guardar datos en Firebase después de cada cambio
-        if (auth && auth.currentUser) {
-            saveUserData();
-        }
+        saveUserData();
     }
 
     // Helper function to calculate subject score
@@ -1022,33 +999,15 @@ function showSubjectDetails(subject) {
         updateProximityMessage(score);
     }
 
-    // Inicializar la aplicación - Verificar si el usuario ya está autenticado al cargar
+    // Inicializar la aplicación con datos locales inmediatamente
     function initializeApp() {
-        console.log("Inicializando aplicación...");
-
-        // Verificar si auth está definido y si hay un usuario autenticado
-        if (typeof auth !== 'undefined') {
-            console.log("Auth está definido");
-            if (auth.currentUser) {
-                console.log("Usuario autenticado:", auth.currentUser.uid);
-                loadUserData(auth.currentUser.uid);
-                // Cargar preferencia de escala después de un pequeño delay
-                setTimeout(() => {
-                    loadGradingScalePreference();
-                }, 500);
-            } else {
-                console.log("No hay usuario autenticado, renderizando materias vacías");
-                window.subjects = window.subjects || [];
-                renderSubjects();
-            }
-        } else {
-            console.log("Auth no está definido, esperando...");
-            // Si auth no está definido, esperar un poco y volver a intentar
-            setTimeout(initializeApp, 1000);
-        }
+        // Load guest data from localStorage right away for instant display
+        const stored = typeof loadGuestData === 'function' ? loadGuestData() : [];
+        window.subjects = stored.length ? stored : (window.subjects || []);
+        renderSubjects();
+        // auth.js onAuthStateChanged will override with Firestore data if logged in
     }
 
-    // Llamar a la función de inicialización
     initializeApp();
 
     // Initialize target grade display

@@ -225,17 +225,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         }
         
-        // Función para cerrar sesión
+        // Función para cerrar sesión (vuelve a modo invitado)
         function signOut() {
             console.log("Cerrando sesión...");
-            
-            // Limpiar localStorage antes de cerrar sesión
-            clearUserDataFromLocalStorage();
-            
             window.auth.signOut()
                 .then(() => {
                     console.log("Déconnexion réussie");
-                    // El listener se encargará de actualizar la UI
+                    // onAuthStateChanged se encarga de activar modo invitado
                 })
                 .catch((error) => {
                     console.error("Erreur lors de la déconnexion:", error);
@@ -271,63 +267,69 @@ document.addEventListener("DOMContentLoaded", () => {
             if (user) {
                 // Usuario conectado
                 console.log("Usuario conectado:", user);
-                
-                // Guardar información en localStorage
+
                 storeUserDataInLocalStorage(user);
-                
-                // Mostrar aplicación principal, ocultar página de login
+
+                // Ocultar login, mostrar app
                 loginPage.style.display = "none";
                 appContainer.style.display = "block";
-                
+
+                // Alternar perfiles en sidebar
+                const guestProfile = document.getElementById("guest-profile");
+                const authProfile = document.getElementById("auth-profile");
+                if (guestProfile) guestProfile.style.display = "none";
+                if (authProfile) authProfile.style.display = "flex";
+
+                // Ocultar sync banner
+                const syncBanner = document.getElementById("sync-banner");
+                if (syncBanner) syncBanner.style.display = "none";
+
                 // Actualizar info de usuario en sidebar
-                userDisplayName.textContent = user.displayName || user.email.split('@')[0];
-                userEmail.textContent = user.email || "";
-                
-                // Si el usuario tiene foto de perfil, usarla; si no, usar avatar generado
+                if (userDisplayName) userDisplayName.textContent = user.displayName || user.email.split('@')[0];
+                if (userEmail) userEmail.textContent = user.email || "";
+
                 const displayName = user.displayName || user.email.split('@')[0];
-                userProfilePic.src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(displayName) + "&background=random";
-                
-                // Asegurar que window.subjects existe antes de cargar datos
+                if (userProfilePic) userProfilePic.src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(displayName) + "&background=random";
+
                 window.subjects = window.subjects || [];
-                
-                // Cargar datos de usuario
+
                 if (typeof loadUserData === 'function') {
                     loadUserData(user.uid);
-                } else {
-                    console.error("La función loadUserData no está definida");
                 }
             } else {
-                // Usuario desconectado
-                console.log("Usuario desconectado");
-                
-                // Verificar si hay datos en localStorage para intentar reconexión
-                const authUid = localStorage.getItem('etudlyAuthUid');
-                const authEmail = localStorage.getItem('etudlyAuthEmail');
-                
-                if (authUid && authEmail) {
-                    console.log("Datos de autenticación encontrados en localStorage, pero no hay sesión activa en Firebase");
-                    // No hacemos nada aquí, dejamos que la UI muestre la página de login
-                    // En una implementación más avanzada, podríamos intentar reconectar automáticamente
-                    
-                    // Limpiar localStorage ya que la sesión Firebase no es válida
-                    clearUserDataFromLocalStorage();
+                // Modo invitado: mostrar app con datos locales
+                console.log("Sin sesión — modo invitado");
+
+                clearUserDataFromLocalStorage();
+
+                loginPage.style.display = "none";
+                appContainer.style.display = "block";
+
+                // Mostrar perfil de invitado en sidebar
+                const guestProfile = document.getElementById("guest-profile");
+                const authProfile = document.getElementById("auth-profile");
+                if (guestProfile) guestProfile.style.display = "flex";
+                if (authProfile) authProfile.style.display = "none";
+
+                // Mostrar sync banner si no fue descartado en esta sesión
+                const syncBanner = document.getElementById("sync-banner");
+                if (syncBanner && !sessionStorage.getItem("etudlySyncBannerDismissed")) {
+                    syncBanner.style.display = "flex";
                 }
-                
-                // Mostrar página de login, ocultar aplicación principal
-                loginPage.style.display = "flex";
-                appContainer.style.display = "none";
-                
+
+                // Cargar datos de localStorage (modo guest)
+                const guestSubjects = typeof loadGuestData === 'function' ? loadGuestData() : [];
+                window.subjects = guestSubjects;
+                if (typeof window.renderSubjects === 'function') window.renderSubjects();
+                if (typeof window.updateFinalScore === 'function') window.updateFinalScore();
+
                 // Resetear formulario de login
-                document.getElementById("login-section").style.display = "block";
-                document.getElementById("login-email-section").style.display = "none";
-                document.getElementById("register-section").style.display = "none";
-                
-                // Limpiar datos
-                if (typeof clearUserData === 'function') {
-                    clearUserData();
-                } else {
-                    window.subjects = [];
-                }
+                const loginSection = document.getElementById("login-section");
+                const loginEmailSection = document.getElementById("login-email-section");
+                const registerSection = document.getElementById("register-section");
+                if (loginSection) loginSection.style.display = "block";
+                if (loginEmailSection) loginEmailSection.style.display = "none";
+                if (registerSection) registerSection.style.display = "none";
             }
         });
         
@@ -364,19 +366,46 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Botón sidebar-logout no encontrado");
         }
         
-        // Protección de navegación para la barra lateral
-        document.querySelectorAll('.sidebar-menu a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                // Verificar autenticación antes de permitir la navegación
-                if (!localStorage.getItem('etudlyAuthToken') && !window.auth.currentUser) {
-                    e.preventDefault();
-                    alert('Vous devez être connecté pour accéder à cette page.');
-                    loginPage.style.display = "flex";
-                    appContainer.style.display = "none";
-                }
+        // Botón cerrar login-page (continuar sin cuenta)
+        const loginPageCloseBtn = document.getElementById("login-page-close");
+        if (loginPageCloseBtn) {
+            loginPageCloseBtn.addEventListener("click", () => {
+                loginPage.style.display = "none";
             });
-        });
-        
+        }
+
+        // Botón de login en sidebar (modo invitado)
+        const sidebarLoginBtn = document.getElementById("sidebar-login");
+        if (sidebarLoginBtn) {
+            sidebarLoginBtn.addEventListener("click", () => {
+                document.getElementById("login-section").style.display = "block";
+                document.getElementById("login-email-section").style.display = "none";
+                document.getElementById("register-section").style.display = "none";
+                loginPage.style.display = "flex";
+            });
+        }
+
+        // Sync banner CTA → abrir registro
+        const syncBannerCTA = document.getElementById("sync-banner-cta");
+        if (syncBannerCTA) {
+            syncBannerCTA.addEventListener("click", () => {
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("login-email-section").style.display = "none";
+                document.getElementById("register-section").style.display = "block";
+                loginPage.style.display = "flex";
+            });
+        }
+
+        // Sync banner dismiss
+        const syncBannerDismiss = document.getElementById("sync-banner-dismiss");
+        if (syncBannerDismiss) {
+            syncBannerDismiss.addEventListener("click", () => {
+                const syncBanner = document.getElementById("sync-banner");
+                if (syncBanner) syncBanner.style.display = "none";
+                sessionStorage.setItem("etudlySyncBannerDismissed", "1");
+            });
+        }
+
         console.log("Inicialización de auth.js completada");
     }
     
