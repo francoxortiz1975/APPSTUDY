@@ -7,6 +7,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Etudly - Tableau de Bord</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0d6efd">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Etudly">
+    <link rel="apple-touch-icon" href="/assets/4.png">
     <link rel="stylesheet" href="../grade-calculator/app.css">
     <link rel="stylesheet" href="dashboard.css">
 </head>
@@ -303,5 +309,10 @@
     </script>
 
     <script src="dashboard.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+    </script>
 </body>
 </html>
