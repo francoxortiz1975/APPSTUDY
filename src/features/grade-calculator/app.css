@@ -439,7 +439,7 @@ input[type="range"] { font-size: 14px; }
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1500;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
@@ -887,7 +887,7 @@ button:active {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1500;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
