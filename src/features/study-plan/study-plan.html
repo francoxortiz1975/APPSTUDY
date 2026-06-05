@@ -7,39 +7,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Etudly - Plan d'Études</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0d6efd">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Etudly">
+    <link rel="apple-touch-icon" href="/assets/4.png">
     <link rel="stylesheet" href="../grade-calculator/app.css">
-    
-    <!-- Meta para Google Sign-In -->
-    <meta name="google-signin-client_id" content="157181619799-7bh6g4fkc1ft81m2tr09dec60cn2sktf.apps.googleusercontent.com">
+    <link rel="stylesheet" href="study-plan.css">
 </head>
 <body>
-    <!-- Container principal de l'application (affiché après connexion) -->
+
+    <!-- Login overlay -->
+    <div id="login-page" class="login-page" style="display:none;">
+        <div class="login-container">
+            <button id="login-page-close" class="login-page-close" title="Continuer sans compte">×</button>
+            <img src="../../../assets/1.png" alt="Logo Etudly" class="login-logo">
+            <h2>Connexion</h2>
+            <button id="login-with-google" class="google-login-btn">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+                Se connecter avec Google
+            </button>
+        </div>
+    </div>
+
+    <!-- App container -->
     <div id="app-container" class="app-container">
-        <!-- Barre latérale -->
+
+        <!-- Sidebar -->
         <div id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <img src="../../../assets/4.png" alt="Logo Etudly">
                 <h2>Etudly</h2>
             </div>
-            
+
             <ul class="sidebar-menu">
                 <li>
-                    <a href="../grade-calculator/app.html" data-page="calculator-page">
+                    <a href="../dashboard/dashboard.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        Tableau de Bord
+                    </a>
+                </li>
+                <li>
+                    <a href="../grade-calculator/app.html">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
                             <line x1="12" y1="8" x2="12" y2="16"></line>
                             <line x1="8" y1="12" x2="16" y2="12"></line>
                         </svg>
                         Calculateur de Notes
-                    </a>
-                </li>
-                <li>
-                    <a href="study-plan.html" class="active" data-page="study-plan-page">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                        </svg>
-                        Plan d'Études
                     </a>
                 </li>
                 <li>
@@ -55,10 +76,35 @@
                         Timeline
                     </a>
                 </li>
+                <li>
+                    <a href="study-plan.html" class="active">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        Plan d'Études
+                    </a>
+                </li>
             </ul>
-            
-            <!-- Profil utilisateur en bas de la barre latérale -->
-            <div class="user-profile">
+
+            <!-- Guest profile -->
+            <div id="guest-profile" class="user-profile">
+                <div class="guest-avatar">👤</div>
+                <div class="user-profile-info">
+                    <span>Invité</span>
+                    <small>Données locales</small>
+                </div>
+                <button id="sidebar-login" class="login-icon-btn" title="Se connecter">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Auth profile -->
+            <div id="auth-profile" class="user-profile" style="display:none;">
                 <img id="sidebar-user-pic" src="" alt="Photo de profil">
                 <div class="user-profile-info">
                     <span id="sidebar-user-name"></span>
@@ -73,10 +119,9 @@
                 </button>
             </div>
         </div>
-        
-        <!-- Contenu principal -->
+
+        <!-- Main content -->
         <div class="main-content">
-            <!-- En-tête de page -->
             <div class="page-header">
                 <button class="toggle-sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -85,224 +130,182 @@
                         <line x1="3" y1="18" x2="21" y2="18"></line>
                     </svg>
                 </button>
-                <h1 id="page-title">Plan d'Études</h1>
-                <button id="grading-scale-btn" class="grading-scale-btn" title="Changer le système de notation">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                <h1>Plan d'Études</h1>
+            </div>
+
+            <!-- Tabs -->
+            <div class="sp-tabs">
+                <button class="sp-tab active" data-tab="topics">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                     </svg>
-                    <span id="current-scale-label">/20</span>
+                    Mes Thèmes
+                </button>
+                <button class="sp-tab" data-tab="quiz">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    Quiz
                 </button>
             </div>
-            
-            <!-- Page plan d'études -->
-            <div id="study-plan-page" class="content-page" style="display: block;">
-                <!-- Intro section -->
-                <div class="plan-intro">
-                    <h3>Créez votre plan d'études personnalisé</h3>
-                    <p>Téléchargez vos documents de cours et organisez votre temps d'étude de manière optimale jusqu'à l'examen.</p>
+
+            <!-- ── Tab 1: Topic Manager ──────────────────────────────── -->
+            <div id="sp-topics" class="sp-panel active">
+                <!-- Empty state shown when no subjects -->
+                <div id="topics-empty" class="sp-empty-state" style="display:none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    <h3>Aucun cours trouvé</h3>
+                    <p>Ajoute des cours dans le <a href="../grade-calculator/app.html">Calculateur de Notes</a> d'abord.</p>
                 </div>
 
-                <!-- Upload section -->
-                <div class="upload-section">
-                    <h4>Étape 1: Téléchargez vos documents</h4>
-                    <div class="upload-container">
-                        <div class="upload-box" id="document-dropzone">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                            <p>Glissez vos documents ici ou</p>
-                            <button id="upload-button" class="button-primary">Sélectionnez des fichiers</button>
-                            <input type="file" id="file-input" multiple accept=".pdf,.docx,.doc,.txt" style="display: none;">
-                            <p class="upload-info">Formats acceptés: PDF, Word, TXT (max 20MB)</p>
-                        </div>
-                    </div>
-                    <div id="uploaded-files-list" class="uploaded-files">
-                        <!-- Les fichiers téléchargés seront affichés ici -->
-                    </div>
-                </div>
+                <!-- Subject cards grid -->
+                <div id="sp-subjects-grid" class="sp-subjects-grid"></div>
+            </div>
 
-                <!-- Exam details section -->
-                <div class="exam-details-section">
-                    <h4>Étape 2: Détails de l'examen</h4>
-                    <form id="exam-details-form" class="study-plan-form">
-                        <div class="form-group">
-                            <label for="exam-subject">Matière:</label>
-                            <select id="exam-subject" required>
-                                <option value="">Sélectionnez une matière</option>
-                                <!-- Les matières seront chargées dynamiquement depuis vos cours existants -->
+            <!-- ── Tab 2: Quiz ───────────────────────────────────────── -->
+            <div id="sp-quiz" class="sp-panel">
+                <div class="quiz-layout">
+
+                    <!-- Setup sidebar -->
+                    <div class="quiz-setup-box">
+                        <h3>Configurer le quiz</h3>
+
+                        <div class="quiz-field">
+                            <label>Matière</label>
+                            <select id="quiz-subject-select" class="quiz-subject-select">
+                                <option value="">Sélectionner une matière</option>
                             </select>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="exam-date">Date de l'examen:</label>
-                            <input type="date" id="exam-date" required>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="study-hours">Temps d'étude disponible par jour (heures):</label>
-                            <input type="number" id="study-hours" min="0.5" max="12" step="0.5" value="2" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Jours préférés pour étudier:</label>
-                            <div class="weekdays-selector">
-                                <div class="day-checkbox">
-                                    <input type="checkbox" id="monday" checked>
-                                    <label for="monday">Lun</label>
-                                </div>
-                                <div class="day-checkbox">
-                                    <input type="checkbox" id="tuesday" checked>
-                                    <label for="tuesday">Mar</label>
-                                </div>
-                                <div class="day-checkbox">
-                                    <input type="checkbox" id="wednesday" checked>
-                                    <label for="wednesday">Mer</label>
-                                </div>
-                                <div class="day-checkbox">
-                                    <input type="checkbox" id="thursday" checked>
-                                    <label for="thursday">Jeu</label>
-                                </div>
-                                <div class="day-checkbox">
-                                    <input type="checkbox" id="friday" checked>
-                                    <label for="friday">Ven</label>
-                                </div>
-                                <div class="day-checkbox">
-                                    <input type="checkbox" id="saturday">
-                                    <label for="saturday">Sam</label>
-                                </div>
-                                <div class="day-checkbox">
-                                    <input type="checkbox" id="sunday">
-                                    <label for="sunday">Dim</label>
-                                </div>
+                        <div class="quiz-field">
+                            <label>Thèmes à inclure</label>
+                            <div id="quiz-topics-list" class="quiz-topics-list">
+                                <span class="quiz-no-topics">Sélectionnez une matière</span>
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="difficulty-level">Niveau de difficulté perçu:</label>
-                            <div class="difficulty-slider">
-                                <input type="range" id="difficulty-level" min="1" max="5" value="3">
-                                <div class="difficulty-labels">
-                                    <span>Facile</span>
-                                    <span>Moyen</span>
-                                    <span>Difficile</span>
-                                </div>
+                        <div class="quiz-field">
+                            <label>Nombre de questions</label>
+                            <div class="quiz-count-pills">
+                                <button class="quiz-count-pill selected" data-count="5">5</button>
+                                <button class="quiz-count-pill" data-count="10">10</button>
+                                <button class="quiz-count-pill" data-count="15">15</button>
                             </div>
                         </div>
 
-                        <button type="submit" id="generate-plan-button" class="button-primary" disabled>
-                            Générer mon plan d'études
+                        <div id="quiz-error" class="quiz-error"></div>
+
+                        <button id="quiz-generate-btn" class="quiz-generate-btn" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            Générer le quiz
                         </button>
-                    </form>
-                </div>
+                    </div>
 
-                <!-- Study plans list (will be shown after plans are created) -->
-                <div id="study-plans-section" class="study-plans-section" style="display: none;">
-                    <h4>Mes plans d'études</h4>
-                    <div id="study-plans-list">
-                        <!-- Study plans will be listed here -->
+                    <!-- Quiz area -->
+                    <div class="quiz-area">
+
+                        <!-- Welcome state -->
+                        <div id="quiz-welcome" class="quiz-state active quiz-welcome">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <h3>Prêt à tester vos connaissances ?</h3>
+                            <p>Sélectionnez une matière, choisissez vos thèmes et lancez le quiz.</p>
+                        </div>
+
+                        <!-- Loading state -->
+                        <div id="quiz-loading" class="quiz-state quiz-loading">
+                            <div class="quiz-spinner"></div>
+                            <span>Génération des questions avec Gemini...</span>
+                        </div>
+
+                        <!-- Question state -->
+                        <div id="quiz-question" class="quiz-state quiz-question-box">
+                            <div class="quiz-meta">
+                                <span id="q-counter" class="quiz-counter">Question 1/10</span>
+                                <span id="q-subject-badge" class="quiz-subject-badge"></span>
+                            </div>
+                            <div class="quiz-progress-bar">
+                                <div id="q-progress-fill" class="quiz-progress-fill" style="width:0%"></div>
+                            </div>
+                            <div id="q-text" class="quiz-question-text"></div>
+                            <div id="q-options" class="quiz-options-grid"></div>
+                            <div id="q-explanation" class="quiz-explanation"></div>
+                            <div style="overflow:hidden;">
+                                <button id="q-next-btn" class="quiz-next-btn" disabled>Suivant →</button>
+                            </div>
+                        </div>
+
+                        <!-- Results state -->
+                        <div id="quiz-results" class="quiz-state quiz-results-box">
+                            <h3>Résultats</h3>
+                            <div id="score-circle" class="score-circle">
+                                <span id="score-number" class="score-number">0%</span>
+                                <span class="score-label">Score</span>
+                            </div>
+                            <p id="score-text" class="score-text"></p>
+                            <p id="score-verdict" class="score-verdict"></p>
+                            <div class="quiz-results-actions">
+                                <button id="btn-retry" class="btn-retry">↺ Réessayer</button>
+                                <button id="btn-new-quiz" class="btn-new-quiz">Nouveau Quiz</button>
+                            </div>
+                            <div class="quiz-review">
+                                <h4>Récapitulatif</h4>
+                                <div id="quiz-review-list"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Popup pour afficher le plan d'études -->
-    <div id="plan-details-popup" class="modal-popup">
-        <div id="plan-details-form" class="popup-form plan-details-form">
-            <h3>Plan d'Études: <span id="plan-title"></span></h3>
-            
-            <div class="plan-dates">
-                <p>Du <span id="plan-start-date"></span> au <span id="plan-end-date"></span></p>
-            </div>
-
-            <div id="plan-calendar" class="plan-calendar">
-                <!-- Calendar will be displayed here -->
-            </div>
-
-            <div id="plan-sessions" class="plan-sessions">
-                <!-- Study sessions will be displayed here -->
-            </div>
-
-            <div class="popup-actions">
-                <button type="button" id="plan-details-close" class="button-secondary">Fermer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Popup pour changer le système de notation -->
-    <div id="grading-scale-popup" class="modal-popup">
-        <div class="popup-form grading-scale-form">
-            <h3>Système de Notation</h3>
-            <p class="popup-description">Choisissez comment afficher vos notes</p>
-
-            <div class="grading-scale-options">
-                <button type="button" class="scale-option" data-scale="20" data-max="20">
-                    <span class="scale-icon">/20</span>
-                    <span class="scale-name">France</span>
-                    <span class="scale-desc">Note sur 20 points</span>
-                </button>
-                <button type="button" class="scale-option" data-scale="100" data-max="100">
-                    <span class="scale-icon">%</span>
-                    <span class="scale-name">Pourcentage</span>
-                    <span class="scale-desc">Note sur 100%</span>
-                </button>
-                <button type="button" class="scale-option" data-scale="10" data-max="10">
-                    <span class="scale-icon">/10</span>
-                    <span class="scale-name">Décimal</span>
-                    <span class="scale-desc">Note sur 10 points</span>
-                </button>
-            </div>
-
-            <div class="popup-actions">
-                <button type="button" id="grading-scale-close">Fermer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Configuration Firebase et Google -->
+    <!-- Firebase -->
     <script src="../../config/config.js"></script>
     <script src="../../config/googleConfig.js"></script>
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
-    
+
     <script>
-        // Initialisation de Firebase
         document.addEventListener('DOMContentLoaded', () => {
-          try {
-            if (window.firebaseConfig && window.firebaseConfig.apiKey) {
-              firebase.initializeApp(window.firebaseConfig);
-              console.log("Firebase initialisé correctement");
-              
-              window.auth = firebase.auth();
-              window.db = firebase.firestore();
-              window.storage = firebase.storage();
-              
-              window.dispatchEvent(new CustomEvent('firebaseReady'));
-            } else {
-              console.error("Erreur: Configuration de Firebase non disponible");
-            }
-          } catch (error) {
-            console.error("Erreur lors de l'initialisation de Firebase:", error);
-          }
+            try {
+                if (window.firebaseConfig && window.firebaseConfig.apiKey) {
+                    firebase.initializeApp(window.firebaseConfig);
+                    window.auth = firebase.auth();
+                    window.db   = firebase.firestore();
+                    window.dispatchEvent(new CustomEvent('firebaseReady'));
+                }
+            } catch(e) { console.warn('Firebase init:', e); }
         });
     </script>
-    
-    <!-- Core modules -->
-    <script src="../../core/state.js"></script>
-    <script src="../../core/grading-utils.js"></script>
-    <script src="../../shared/grading-scale-ui.js"></script>
 
-    <!-- Scripts de l'application -->
-    <script src="../../database/firestore.js"></script>
-    <script src="../../auth/auth-manager.js"></script>
-    <script src="../../auth/auth.js"></script>
+    <!-- Sidebar toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.querySelector('.toggle-sidebar');
+            const sidebar   = document.getElementById('sidebar');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+            }
+        });
+    </script>
+
     <script src="study-plan.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+    </script>
 </body>
 </html>

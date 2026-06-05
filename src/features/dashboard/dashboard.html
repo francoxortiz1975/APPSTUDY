@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etudly - Timeline</title>
+    <title>Etudly - Tableau de Bord</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0d6efd">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-title" content="Etudly">
     <link rel="apple-touch-icon" href="/assets/4.png">
     <link rel="stylesheet" href="../grade-calculator/app.css">
-    <link rel="stylesheet" href="timeline.css">
+    <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
@@ -43,7 +43,7 @@
 
             <ul class="sidebar-menu">
                 <li>
-                    <a href="../dashboard/dashboard.html">
+                    <a href="dashboard.html" class="active">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="7" height="7"></rect>
                             <rect x="14" y="3" width="7" height="7"></rect>
@@ -64,7 +64,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="timeline.html" class="active">
+                    <a href="../timeline/timeline.html">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="8" y1="6" x2="21" y2="6"></line>
                             <line x1="8" y1="12" x2="21" y2="12"></line>
@@ -130,82 +130,155 @@
                         <line x1="3" y1="18" x2="21" y2="18"></line>
                     </svg>
                 </button>
-                <h1>Timeline</h1>
-                <!-- Semester end config -->
-                <div class="timeline-meta-control">
-                    <label for="meta-date-input">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
-                        </svg>
-                        Fin de session
-                    </label>
-                    <input type="date" id="meta-date-input">
-                </div>
+                <h1>Tableau de Bord</h1>
             </div>
 
-            <!-- Legend -->
-            <div class="timeline-legend">
-                <div class="legend-item">
-                    <div class="legend-dot type-exam"></div><span>Examen</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot type-assignment"></div><span>Devoir</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot type-quiz"></div><span>Quiz / Test</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line today-legend"></div><span>Aujourd'hui</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line meta-legend"></div><span>Fin de session</span>
-                </div>
+            <!-- Greeting -->
+            <div class="dash-greeting">
+                <h2 id="dash-greeting-text">Bonjour !</h2>
+                <p id="dash-date-text"></p>
             </div>
 
-            <!-- Timeline -->
-            <div class="timeline-outer">
-                <div class="timeline-scroll-wrapper" id="timeline-scroll">
-                    <!-- Header: month labels -->
-                    <div class="tl-header">
-                        <div class="tl-label-col"></div>
-                        <div class="tl-months-col" id="tl-months"></div>
-                    </div>
-                    <!-- Subject rows -->
-                    <div id="timeline-rows"></div>
-                </div>
-            </div>
-
-            <!-- Empty state (shown when no subjects) -->
-            <div id="timeline-empty" class="timeline-empty-state" style="display:none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
+            <!-- Onboarding: shown when no subjects exist -->
+            <div id="dash-onboarding" class="dash-onboarding" style="display:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                <h3>Aucun cours trouvé</h3>
-                <p>Ajoute des cours dans le <a href="../grade-calculator/app.html">Calculateur de Notes</a> pour les voir ici.</p>
+                <h3>Bienvenue sur Etudly !</h3>
+                <p>Commencez par ajouter vos cours dans le Calculateur de Notes. Toutes vos données apparaîtront ici automatiquement.</p>
+                <div class="onboarding-steps">
+                    <a href="../grade-calculator/app.html" class="onboarding-step step-1">
+                        <div class="step-num">1</div>
+                        Ajouter vos cours → Calculateur de Notes
+                    </a>
+                    <a href="../timeline/timeline.html" class="onboarding-step step-2">
+                        <div class="step-num">2</div>
+                        Placer vos examens → Timeline
+                    </a>
+                    <a href="../study-plan/study-plan.html" class="onboarding-step step-3">
+                        <div class="step-num">3</div>
+                        Réviser avec des quiz → Plan d'Études
+                    </a>
+                </div>
+            </div>
+
+            <!-- Dashboard content: shown when subjects exist -->
+            <div id="dash-content" style="display:none;">
+                <!-- Stats row -->
+                <div class="dash-stats-row">
+                    <div class="dash-stat-card stat-grades">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div id="stat-avg" class="stat-number">—</div>
+                            <div class="stat-label">Moyenne générale</div>
+                        </div>
+                    </div>
+                    <div class="dash-stat-card stat-timeline">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div id="stat-deadlines" class="stat-number">—</div>
+                            <div class="stat-label">Échéances à venir</div>
+                        </div>
+                    </div>
+                    <div class="dash-stat-card stat-plan">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div id="stat-topics" class="stat-number">—</div>
+                            <div class="stat-label">Thèmes d'étude</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Widget cards -->
+                <div class="dash-widgets">
+
+                    <!-- Grades widget -->
+                    <div class="dash-widget widget-grades">
+                        <div class="dash-widget-header">
+                            <div class="widget-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                </svg>
+                            </div>
+                            <span class="widget-title">Mes Notes</span>
+                        </div>
+                        <div class="dash-widget-body">
+                            <div id="grades-widget-content"></div>
+                        </div>
+                        <div class="dash-widget-footer">
+                            <a href="../grade-calculator/app.html" class="dash-cta">
+                                Voir le calculateur →
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Timeline widget -->
+                    <div class="dash-widget widget-timeline">
+                        <div class="dash-widget-header">
+                            <div class="widget-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <span class="widget-title">Prochaines Échéances</span>
+                        </div>
+                        <div class="dash-widget-body">
+                            <div id="timeline-widget-content"></div>
+                        </div>
+                        <div class="dash-widget-footer">
+                            <a href="../timeline/timeline.html" class="dash-cta">
+                                Voir la timeline →
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Study plan widget -->
+                    <div class="dash-widget widget-plan">
+                        <div class="dash-widget-header">
+                            <div class="widget-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                                </svg>
+                            </div>
+                            <span class="widget-title">Plan d'Études</span>
+                        </div>
+                        <div class="dash-widget-body">
+                            <div id="plan-widget-content"></div>
+                        </div>
+                        <div class="dash-widget-footer">
+                            <a href="../study-plan/study-plan.html" class="dash-cta">
+                                Voir le plan d'études →
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Date edit modal -->
-    <div id="date-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3 id="modal-subject-name">Dates du cours</h3>
-                <button id="modal-close" class="modal-close-btn">×</button>
-            </div>
-            <p class="modal-hint">Ajoute une date et un type pour chaque évaluation.</p>
-            <div id="modal-grades-list" class="modal-grades-list"></div>
-            <div class="modal-footer">
-                <button id="modal-cancel" class="btn-secondary">Annuler</button>
-                <button id="modal-save" class="btn-primary">Sauvegarder</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase config & SDK -->
+    <!-- Firebase -->
     <script src="../../config/config.js"></script>
     <script src="../../config/googleConfig.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -218,14 +291,13 @@
                 if (window.firebaseConfig && window.firebaseConfig.apiKey) {
                     firebase.initializeApp(window.firebaseConfig);
                     window.auth = firebase.auth();
-                    window.db  = firebase.firestore();
+                    window.db   = firebase.firestore();
                     window.dispatchEvent(new CustomEvent('firebaseReady'));
                 }
-            } catch(e) { console.warn('Firebase init error:', e); }
+            } catch(e) { console.warn('Firebase init:', e); }
         });
     </script>
 
-    <!-- Sidebar toggle (shared behaviour) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const toggleBtn = document.querySelector('.toggle-sidebar');
@@ -236,7 +308,7 @@
         });
     </script>
 
-    <script src="timeline.js"></script>
+    <script src="dashboard.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(() => {});
