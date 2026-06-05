@@ -332,38 +332,6 @@ body {
   color: #721c24;
 }
 
-/* AI Tip */
-.ai-tip {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  background: var(--card-bg, #f0f4ff);
-  border: 1px solid var(--border-color, #d0d7f7);
-  border-radius: 8px;
-  padding: 10px 14px;
-  width: 100%;
-  text-align: left;
-}
-
-.ai-tip-icon {
-  font-size: 1.1rem;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.ai-tip-text {
-  font-size: 0.8rem;
-  color: var(--text-secondary, #495057);
-  line-height: 1.5;
-  white-space: pre-line;
-  word-break: break-word;
-  flex: 1;
-}
-
-.ai-tip-text.loading {
-  opacity: 0.6;
-  font-style: italic;
-}
 
 @media (max-width: 600px) {
   .score-dashboard {
