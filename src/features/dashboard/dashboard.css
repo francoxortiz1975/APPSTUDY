@@ -441,3 +441,18 @@
 .step-1 .step-num { background: #e7f1ff; color: #0d6efd; }
 .step-2 .step-num { background: #fff0f0; color: #dc3545; }
 .step-3 .step-num { background: #f3eeff; color: #6f42c1; }
+
+/* ── Mobile polish ───────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .dash-greeting  { padding: 16px 16px 6px; }
+    .dash-stats-row { padding: 10px 16px 4px; gap: 10px; }
+    .dash-widgets   { padding: 10px 16px; gap: 10px; }
+    .dash-stat-card { padding: 12px 14px; }
+    .stat-icon      { width: 36px; height: 36px; }
+    .stat-value     { font-size: 1.3rem; }
+}
+
+@media (max-width: 480px) {
+    .dash-stats-row { grid-template-columns: 1fr 1fr; }
+    .dash-stat-card.stat-plan { grid-column: span 2; }
+}
