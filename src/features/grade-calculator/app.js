@@ -122,38 +122,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
    
 
-// Ajoutez aussi un listener pour fermer la barre latérale en cliquant en dehors
-document.addEventListener('click', function(event) {
+// ── Sidebar toggle (mobile) ──────────────────────────────────────────
+(function() {
+    const toggleBtn = document.querySelector('.toggle-sidebar');
+    const sidebar   = document.getElementById('sidebar');
+    const overlay   = document.getElementById('sidebar-overlay');
 
-     // Gestion de la barre latérale en mode mobile
-     const toggleSidebarBtn = document.querySelector('.toggle-sidebar');
-     const sidebar = document.querySelector('.sidebar');
- 
-     if (toggleSidebarBtn) {
-         toggleSidebarBtn.addEventListener('click', function() {
-             sidebar.classList.toggle('show');
-         });
-     }
- 
-     // Fermer la barre latérale lorsqu'on clique sur un élément du menu en mode mobile
-     const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
-     sidebarLinks.forEach(link => {
-         link.addEventListener('click', function() {
-             if (window.innerWidth <= 768) {
-                 sidebar.classList.remove('show');
-             }
-         });
-     });
-});
-
-// Gestion du bouton retour sur mobile pour fermer la sidebar
-window.addEventListener('popstate', function(event) {
-    if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
-        event.preventDefault();
-        sidebar.classList.remove('show');
-        history.pushState(null, document.title, window.location.href);
+    function openSidebar() {
+        sidebar.classList.add('show');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
-});
+    function closeSidebar() {
+        sidebar.classList.remove('show');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.contains('show') ? closeSidebar() : openSidebar();
+        });
+    }
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+
+    // Close on nav link click (mobile)
+    document.querySelectorAll('.sidebar-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) closeSidebar();
+        });
+    });
+})();
 
 // On crée un état initial pour pouvoir revenir en arrière
 history.pushState(null, document.title, window.location.href);

@@ -535,10 +535,16 @@
 
 /* ── Mobile ─────────────────────────────────────────────────────────── */
 
+@media (max-width: 768px) {
+    .timeline-meta-bar { padding: 10px 14px; gap: 8px; flex-wrap: wrap; }
+    .timeline-table-wrapper { padding: 0 0 8px; }
+    .tl-modal { padding: 20px 16px; }
+}
+
 @media (max-width: 600px) {
     .tl-label-col,
     .timeline-row-label {
-        width: 110px;
+        width: 100px;
     }
 
     .timeline-meta-control label span { display: none; }

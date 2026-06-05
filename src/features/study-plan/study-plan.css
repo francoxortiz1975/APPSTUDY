@@ -704,7 +704,19 @@
 
 /* ── Mobile ─────────────────────────────────────────────────────────── */
 
-@media (max-width: 600px) {
-    .sp-tab { padding: 8px 14px; font-size: 0.82rem; }
+@media (max-width: 768px) {
+    .sp-tabs { padding: 10px 14px 0; }
+    .sp-tab  { padding: 8px 14px; font-size: 0.82rem; }
     .quiz-setup-box { position: static; }
+    .sp-content-tab { padding: 14px 14px; }
+    .topics-grid    { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .quiz-answer-grid { grid-template-columns: 1fr; }
+    .quiz-progress-bar { height: 6px; }
+    .score-circle   { width: 80px; height: 80px; font-size: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+    .topics-grid    { grid-template-columns: 1fr; }
+    .score-actions  { flex-direction: column; gap: 10px; }
+    .score-actions button { width: 100%; }
 }
