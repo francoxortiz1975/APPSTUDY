@@ -6,9 +6,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etudly - Plan d'Études</title>
+    <title>Etudly - Tableau de Bord</title>
     <link rel="stylesheet" href="../grade-calculator/app.css">
-    <link rel="stylesheet" href="study-plan.css">
+    <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
@@ -37,7 +37,7 @@
 
             <ul class="sidebar-menu">
                 <li>
-                    <a href="../dashboard/dashboard.html">
+                    <a href="dashboard.html" class="active">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="7" height="7"></rect>
                             <rect x="14" y="3" width="7" height="7"></rect>
@@ -71,7 +71,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="study-plan.html" class="active">
+                    <a href="../study-plan/study-plan.html">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
@@ -124,141 +124,149 @@
                         <line x1="3" y1="18" x2="21" y2="18"></line>
                     </svg>
                 </button>
-                <h1>Plan d'Études</h1>
+                <h1>Tableau de Bord</h1>
             </div>
 
-            <!-- Tabs -->
-            <div class="sp-tabs">
-                <button class="sp-tab active" data-tab="topics">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                    </svg>
-                    Mes Thèmes
-                </button>
-                <button class="sp-tab" data-tab="quiz">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                    Quiz
-                </button>
+            <!-- Greeting -->
+            <div class="dash-greeting">
+                <h2 id="dash-greeting-text">Bonjour !</h2>
+                <p id="dash-date-text"></p>
             </div>
 
-            <!-- ── Tab 1: Topic Manager ──────────────────────────────── -->
-            <div id="sp-topics" class="sp-panel active">
-                <!-- Empty state shown when no subjects -->
-                <div id="topics-empty" class="sp-empty-state" style="display:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                    </svg>
-                    <h3>Aucun cours trouvé</h3>
-                    <p>Ajoute des cours dans le <a href="../grade-calculator/app.html">Calculateur de Notes</a> d'abord.</p>
+            <!-- Onboarding: shown when no subjects exist -->
+            <div id="dash-onboarding" class="dash-onboarding" style="display:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <h3>Bienvenue sur Etudly !</h3>
+                <p>Commencez par ajouter vos cours dans le Calculateur de Notes. Toutes vos données apparaîtront ici automatiquement.</p>
+                <div class="onboarding-steps">
+                    <a href="../grade-calculator/app.html" class="onboarding-step step-1">
+                        <div class="step-num">1</div>
+                        Ajouter vos cours → Calculateur de Notes
+                    </a>
+                    <a href="../timeline/timeline.html" class="onboarding-step step-2">
+                        <div class="step-num">2</div>
+                        Placer vos examens → Timeline
+                    </a>
+                    <a href="../study-plan/study-plan.html" class="onboarding-step step-3">
+                        <div class="step-num">3</div>
+                        Réviser avec des quiz → Plan d'Études
+                    </a>
+                </div>
+            </div>
+
+            <!-- Dashboard content: shown when subjects exist -->
+            <div id="dash-content" style="display:none;">
+                <!-- Stats row -->
+                <div class="dash-stats-row">
+                    <div class="dash-stat-card stat-grades">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div id="stat-avg" class="stat-number">—</div>
+                            <div class="stat-label">Moyenne générale</div>
+                        </div>
+                    </div>
+                    <div class="dash-stat-card stat-timeline">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div id="stat-deadlines" class="stat-number">—</div>
+                            <div class="stat-label">Échéances à venir</div>
+                        </div>
+                    </div>
+                    <div class="dash-stat-card stat-plan">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <div id="stat-topics" class="stat-number">—</div>
+                            <div class="stat-label">Thèmes d'étude</div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Subject cards grid -->
-                <div id="sp-subjects-grid" class="sp-subjects-grid"></div>
-            </div>
+                <!-- Widget cards -->
+                <div class="dash-widgets">
 
-            <!-- ── Tab 2: Quiz ───────────────────────────────────────── -->
-            <div id="sp-quiz" class="sp-panel">
-                <div class="quiz-layout">
-
-                    <!-- Setup sidebar -->
-                    <div class="quiz-setup-box">
-                        <h3>Configurer le quiz</h3>
-
-                        <div class="quiz-field">
-                            <label>Matière</label>
-                            <select id="quiz-subject-select" class="quiz-subject-select">
-                                <option value="">Sélectionner une matière</option>
-                            </select>
+                    <!-- Grades widget -->
+                    <div class="dash-widget widget-grades">
+                        <div class="dash-widget-header">
+                            <div class="widget-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                </svg>
+                            </div>
+                            <span class="widget-title">Mes Notes</span>
                         </div>
-
-                        <div class="quiz-field">
-                            <label>Thèmes à inclure</label>
-                            <div id="quiz-topics-list" class="quiz-topics-list">
-                                <span class="quiz-no-topics">Sélectionnez une matière</span>
-                            </div>
+                        <div class="dash-widget-body">
+                            <div id="grades-widget-content"></div>
                         </div>
-
-                        <div class="quiz-field">
-                            <label>Nombre de questions</label>
-                            <div class="quiz-count-pills">
-                                <button class="quiz-count-pill selected" data-count="5">5</button>
-                                <button class="quiz-count-pill" data-count="10">10</button>
-                                <button class="quiz-count-pill" data-count="15">15</button>
-                            </div>
-                        </div>
-
-                        <div id="quiz-error" class="quiz-error"></div>
-
-                        <button id="quiz-generate-btn" class="quiz-generate-btn" disabled>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                            </svg>
-                            Générer le quiz
-                        </button>
-                    </div>
-
-                    <!-- Quiz area -->
-                    <div class="quiz-area">
-
-                        <!-- Welcome state -->
-                        <div id="quiz-welcome" class="quiz-state active quiz-welcome">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="1.5">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                            </svg>
-                            <h3>Prêt à tester vos connaissances ?</h3>
-                            <p>Sélectionnez une matière, choisissez vos thèmes et lancez le quiz.</p>
-                        </div>
-
-                        <!-- Loading state -->
-                        <div id="quiz-loading" class="quiz-state quiz-loading">
-                            <div class="quiz-spinner"></div>
-                            <span>Génération des questions avec Gemini...</span>
-                        </div>
-
-                        <!-- Question state -->
-                        <div id="quiz-question" class="quiz-state quiz-question-box">
-                            <div class="quiz-meta">
-                                <span id="q-counter" class="quiz-counter">Question 1/10</span>
-                                <span id="q-subject-badge" class="quiz-subject-badge"></span>
-                            </div>
-                            <div class="quiz-progress-bar">
-                                <div id="q-progress-fill" class="quiz-progress-fill" style="width:0%"></div>
-                            </div>
-                            <div id="q-text" class="quiz-question-text"></div>
-                            <div id="q-options" class="quiz-options-grid"></div>
-                            <div id="q-explanation" class="quiz-explanation"></div>
-                            <div style="overflow:hidden;">
-                                <button id="q-next-btn" class="quiz-next-btn" disabled>Suivant →</button>
-                            </div>
-                        </div>
-
-                        <!-- Results state -->
-                        <div id="quiz-results" class="quiz-state quiz-results-box">
-                            <h3>Résultats</h3>
-                            <div id="score-circle" class="score-circle">
-                                <span id="score-number" class="score-number">0%</span>
-                                <span class="score-label">Score</span>
-                            </div>
-                            <p id="score-text" class="score-text"></p>
-                            <p id="score-verdict" class="score-verdict"></p>
-                            <div class="quiz-results-actions">
-                                <button id="btn-retry" class="btn-retry">↺ Réessayer</button>
-                                <button id="btn-new-quiz" class="btn-new-quiz">Nouveau Quiz</button>
-                            </div>
-                            <div class="quiz-review">
-                                <h4>Récapitulatif</h4>
-                                <div id="quiz-review-list"></div>
-                            </div>
+                        <div class="dash-widget-footer">
+                            <a href="../grade-calculator/app.html" class="dash-cta">
+                                Voir le calculateur →
+                            </a>
                         </div>
                     </div>
+
+                    <!-- Timeline widget -->
+                    <div class="dash-widget widget-timeline">
+                        <div class="dash-widget-header">
+                            <div class="widget-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <span class="widget-title">Prochaines Échéances</span>
+                        </div>
+                        <div class="dash-widget-body">
+                            <div id="timeline-widget-content"></div>
+                        </div>
+                        <div class="dash-widget-footer">
+                            <a href="../timeline/timeline.html" class="dash-cta">
+                                Voir la timeline →
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Study plan widget -->
+                    <div class="dash-widget widget-plan">
+                        <div class="dash-widget-header">
+                            <div class="widget-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                                </svg>
+                            </div>
+                            <span class="widget-title">Plan d'Études</span>
+                        </div>
+                        <div class="dash-widget-body">
+                            <div id="plan-widget-content"></div>
+                        </div>
+                        <div class="dash-widget-footer">
+                            <a href="../study-plan/study-plan.html" class="dash-cta">
+                                Voir le plan d'études →
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -284,7 +292,6 @@
         });
     </script>
 
-    <!-- Sidebar toggle -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const toggleBtn = document.querySelector('.toggle-sidebar');
@@ -295,6 +302,6 @@
         });
     </script>
 
-    <script src="study-plan.js"></script>
+    <script src="dashboard.js"></script>
 </body>
 </html>
